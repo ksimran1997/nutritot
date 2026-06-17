@@ -162,4 +162,56 @@
 }
 */
 
+@layer theme {
+  :root {
+    --background: oklch(0.985 0.012 95);
+    --foreground: oklch(0.28 0.04 30);
+
+    --surface: oklch(1 0 0);
+    --surface-foreground: var(--foreground);
+
+    --overlay: oklch(1 0 0);
+    --overlay-foreground: var(--foreground);
+
+    --muted: oklch(0.58 0.03 40);
+
+    --default: oklch(0.95 0.02 80);
+    --default-foreground: var(--foreground);
+
+    --accent: oklch(0.72 0.14 35);
+    --accent-foreground: oklch(0.99 0.005 95);
+
+    --field-background: oklch(1 0 0);
+    --field-foreground: var(--foreground);
+    --field-placeholder: var(--muted);
+
+    --success: oklch(0.73 0.16 150);
+    --success-foreground: oklch(0.22 0.04 150);
+
+    --warning: oklch(0.8 0.15 75);
+    --warning-foreground: oklch(0.28 0.05 60);
+
+    --danger: oklch(0.64 0.21 25);
+    --danger-foreground: oklch(0.99 0.005 95);
+
+    --border: oklch(0.91 0.02 80);
+    --separator: oklch(0.91 0.02 80);
+    --focus: var(--accent);
+    --link: var(--accent);
+  }
+}
+
+@layer theme {
+  @theme {
+    --color-mint: oklch(0.72 0.12 165);
+    --color-mint-soft: oklch(0.94 0.04 165);
+    --color-sky: oklch(0.7 0.12 235);
+    --color-sky-soft: oklch(0.94 0.04 235);
+    --color-peach: oklch(0.8 0.1 55);
+    --color-peach-soft: oklch(0.95 0.04 55);
+    --color-grape: oklch(0.66 0.13 305);
+    --color-grape-soft: oklch(0.95 0.04 305);
+  }
+}
+
 @source './node_modules/heroui-native/lib';
