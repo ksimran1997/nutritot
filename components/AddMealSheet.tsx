@@ -1,9 +1,8 @@
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { Pressable, View } from 'react-native';
 import { BottomSheetScrollView } from '@gorhom/bottom-sheet';
 import { BottomSheet, Button, Input, Label, Text, TextField } from 'heroui-native';
 
-import { FOOD_PRESETS, type FoodPreset } from '@/lib/foods';
 import { useBabyStore } from '@/lib/store';
 import type { MealType } from '@/lib/types';
 import { cn, todayKey, uid } from '@/lib/utils';
@@ -27,29 +26,14 @@ export function AddMealSheet({ isOpen, onOpenChange }: AddMealSheetProps) {
   const [type, setType] = useState<MealType>('breakfast');
   const [calories, setCalories] = useState('');
   const [protein, setProtein] = useState('');
-  const [iron, setIron] = useState('');
-  const [calcium, setCalcium] = useState('');
 
   const canSave = name.trim().length > 0;
-
-  const presets = useMemo(() => FOOD_PRESETS, []);
-
-  function applyPreset(p: FoodPreset) {
-    setName(p.name);
-    setType(p.type);
-    setCalories(String(p.calories));
-    setProtein(String(p.protein));
-    setIron(String(p.iron));
-    setCalcium(String(p.calcium));
-  }
 
   function reset() {
     setName('');
     setType('breakfast');
     setCalories('');
     setProtein('');
-    setIron('');
-    setCalcium('');
   }
 
   function handleSave() {
@@ -61,8 +45,8 @@ export function AddMealSheet({ isOpen, onOpenChange }: AddMealSheetProps) {
       name: name.trim(),
       calories: Number(calories) || 0,
       protein: Number(protein) || 0,
-      iron: Number(iron) || 0,
-      calcium: Number(calcium) || 0,
+      iron: 0,
+      calcium: 0,
     });
     reset();
     onOpenChange(false);
@@ -80,24 +64,6 @@ export function AddMealSheet({ isOpen, onOpenChange }: AddMealSheetProps) {
           <BottomSheetScrollView keyboardShouldPersistTaps="handled">
             <View className="gap-5 px-1 pb-10">
               <BottomSheet.Title>Log a meal</BottomSheet.Title>
-
-              <View className="gap-2">
-                <Label>Quick add</Label>
-                <View className="flex-row flex-wrap gap-2">
-                  {presets.map((p) => (
-                    <Pressable
-                      key={p.name}
-                      onPress={() => applyPreset(p)}
-                      className={cn(
-                        'border-border rounded-full border px-3 py-2',
-                        name === p.name ? 'bg-peach-soft' : 'bg-surface',
-                      )}
-                    >
-                      <Text className="text-foreground text-sm">{p.name}</Text>
-                    </Pressable>
-                  ))}
-                </View>
-              </View>
 
               <TextField isRequired>
                 <Label>Food</Label>
@@ -131,7 +97,7 @@ export function AddMealSheet({ isOpen, onOpenChange }: AddMealSheetProps) {
 
               <View className="flex-row gap-3">
                 <TextField className="flex-1">
-                  <Label>Energy (kcal)</Label>
+                  <Label>Calories (kcal)</Label>
                   <Input
                     value={calories}
                     onChangeText={setCalories}
@@ -144,26 +110,6 @@ export function AddMealSheet({ isOpen, onOpenChange }: AddMealSheetProps) {
                   <Input
                     value={protein}
                     onChangeText={setProtein}
-                    keyboardType="numeric"
-                    placeholder="0"
-                  />
-                </TextField>
-              </View>
-              <View className="flex-row gap-3">
-                <TextField className="flex-1">
-                  <Label>Iron (mg)</Label>
-                  <Input
-                    value={iron}
-                    onChangeText={setIron}
-                    keyboardType="numeric"
-                    placeholder="0"
-                  />
-                </TextField>
-                <TextField className="flex-1">
-                  <Label>Calcium (mg)</Label>
-                  <Input
-                    value={calcium}
-                    onChangeText={setCalcium}
                     keyboardType="numeric"
                     placeholder="0"
                   />

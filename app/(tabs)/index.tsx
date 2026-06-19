@@ -46,10 +46,8 @@ export default function TodayScreen() {
   const targets = getNutritionTargets(ageMonths);
 
   const bars: { key: NutrientKey; label: string; unit: string; colorClass: string }[] = [
-    { key: 'calories', label: 'Energy', unit: 'kcal', colorClass: 'bg-peach' },
+    { key: 'calories', label: 'Calories', unit: 'kcal', colorClass: 'bg-peach' },
     { key: 'protein', label: 'Protein', unit: 'g', colorClass: 'bg-mint' },
-    { key: 'iron', label: 'Iron', unit: 'mg', colorClass: 'bg-grape' },
-    { key: 'calcium', label: 'Calcium', unit: 'mg', colorClass: 'bg-sky' },
   ];
 
   return (
