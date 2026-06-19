@@ -90,6 +90,14 @@ export default function TodayScreen() {
                 colorClass={b.colorClass}
               />
             ))}
+            <View className="bg-default/60 gap-0.5 rounded-xl p-3">
+              <Text className="text-foreground text-xs font-semibold">Average daily calories</Text>
+              <Text className="text-muted text-[11px] leading-4">
+                Babies at {stage.label.toLowerCase()} need around {targets.calories} kcal per day on
+                average. Most of this comes from breast milk or formula in the early months, with
+                solids adding more as your baby grows.
+              </Text>
+            </View>
             <Text className="text-muted text-[11px] leading-4">
               Targets are educational estimates based on WHO guidance for {stage.label}. Always
               follow your pediatrician&apos;s advice.
