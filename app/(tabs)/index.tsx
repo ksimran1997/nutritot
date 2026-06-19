@@ -48,6 +48,8 @@ export default function TodayScreen() {
   const bars: { key: NutrientKey; label: string; unit: string; colorClass: string }[] = [
     { key: 'calories', label: 'Calories', unit: 'kcal', colorClass: 'bg-peach' },
     { key: 'protein', label: 'Protein', unit: 'g', colorClass: 'bg-mint' },
+    { key: 'iron', label: 'Iron', unit: 'mg', colorClass: 'bg-grape' },
+    { key: 'calcium', label: 'Calcium', unit: 'mg', colorClass: 'bg-sky' },
   ];
 
   return (
@@ -111,7 +113,8 @@ export default function TodayScreen() {
                   <View className="flex-1 gap-0.5">
                     <Text className="text-foreground font-medium">{m.name}</Text>
                     <Text className="text-muted text-xs">
-                      {MEAL_LABELS[m.type]} · {Math.round(m.calories)} kcal · {m.protein}g protein
+                      {MEAL_LABELS[m.type]} · {Math.round(m.calories)} kcal · {m.protein}g protein ·{' '}
+                      {m.iron}mg iron · {m.calcium}mg calcium
                     </Text>
                   </View>
                   <Pressable

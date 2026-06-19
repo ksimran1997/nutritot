@@ -26,6 +26,8 @@ export function AddMealSheet({ isOpen, onOpenChange }: AddMealSheetProps) {
   const [type, setType] = useState<MealType>('breakfast');
   const [calories, setCalories] = useState('');
   const [protein, setProtein] = useState('');
+  const [iron, setIron] = useState('');
+  const [calcium, setCalcium] = useState('');
 
   const canSave = name.trim().length > 0;
 
@@ -34,6 +36,8 @@ export function AddMealSheet({ isOpen, onOpenChange }: AddMealSheetProps) {
     setType('breakfast');
     setCalories('');
     setProtein('');
+    setIron('');
+    setCalcium('');
   }
 
   function handleSave() {
@@ -45,8 +49,8 @@ export function AddMealSheet({ isOpen, onOpenChange }: AddMealSheetProps) {
       name: name.trim(),
       calories: Number(calories) || 0,
       protein: Number(protein) || 0,
-      iron: 0,
-      calcium: 0,
+      iron: Number(iron) || 0,
+      calcium: Number(calcium) || 0,
     });
     reset();
     onOpenChange(false);
@@ -110,6 +114,27 @@ export function AddMealSheet({ isOpen, onOpenChange }: AddMealSheetProps) {
                   <Input
                     value={protein}
                     onChangeText={setProtein}
+                    keyboardType="numeric"
+                    placeholder="0"
+                  />
+                </TextField>
+              </View>
+
+              <View className="flex-row gap-3">
+                <TextField className="flex-1">
+                  <Label>Iron (mg)</Label>
+                  <Input
+                    value={iron}
+                    onChangeText={setIron}
+                    keyboardType="numeric"
+                    placeholder="0"
+                  />
+                </TextField>
+                <TextField className="flex-1">
+                  <Label>Calcium (mg)</Label>
+                  <Input
+                    value={calcium}
+                    onChangeText={setCalcium}
                     keyboardType="numeric"
                     placeholder="0"
                   />
