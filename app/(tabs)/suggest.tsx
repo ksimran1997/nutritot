@@ -23,13 +23,16 @@ const QUICK_INGREDIENTS = [
   'oats',
   'avocado',
   'lentils',
+  'soya chunks',
+  'paneer',
+  'chickpeas',
   'carrot',
   'sweet potato',
+  'rice',
   'egg',
   'chicken',
   'tofu',
   'yogurt',
-  'rice',
   'broccoli',
 ];
 

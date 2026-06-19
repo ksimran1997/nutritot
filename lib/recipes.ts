@@ -174,6 +174,244 @@ export const RECIPES: Recipe[] = [
       'Serve at a safe temperature.',
     ],
   },
+
+  // ---- Indian ----
+  {
+    id: 'soya-veg-khichdi',
+    title: 'Soya chunk & veg khichdi',
+    emoji: '🍚',
+    stageIds: ['9-11m', '12-23m', '24m+'],
+    diets: ['vegan', 'vegetarian', 'non-vegetarian'],
+    prepMins: 25,
+    highlights: ['Protein', 'Iron', 'Energy'],
+    ingredients: [
+      'Soya chunks (soaked, finely chopped)',
+      'Rice',
+      'Moong dal',
+      'Soft cooked carrot',
+      'A little ghee or oil',
+      'Water',
+    ],
+    steps: [
+      'Soak soya chunks in hot water, squeeze and chop very finely.',
+      'Pressure-cook rice, dal, soya and carrot until very soft and mushy.',
+      'Mash to an age-appropriate texture and stir in a little ghee or oil.',
+    ],
+  },
+  {
+    id: 'paneer-veg-mash',
+    title: 'Paneer & vegetable mash',
+    emoji: '🧀',
+    stageIds: ['9-11m', '12-23m', '24m+'],
+    diets: ['vegetarian', 'non-vegetarian'],
+    prepMins: 15,
+    highlights: ['Calcium', 'Protein'],
+    ingredients: ['Soft paneer (cottage cheese)', 'Steamed peas', 'Boiled potato', 'A little ghee'],
+    steps: [
+      'Crumble soft paneer finely.',
+      'Mash with steamed peas and boiled potato.',
+      'Stir in a little ghee and serve warm.',
+    ],
+  },
+  {
+    id: 'dal-rice',
+    title: 'Soft dal & rice',
+    emoji: '🥘',
+    stageIds: ['6-8m', '9-11m', '12-23m', '24m+'],
+    diets: ['vegan', 'vegetarian', 'non-vegetarian'],
+    prepMins: 20,
+    highlights: ['Protein', 'Iron', 'Energy'],
+    ingredients: [
+      'Moong dal (lentils)',
+      'Rice',
+      'A pinch of turmeric',
+      'Water',
+      'A little ghee or oil',
+    ],
+    steps: [
+      'Cook dal and rice together with turmeric until very soft.',
+      'Mash well to a smooth, runny consistency.',
+      'Add a little ghee or oil for energy.',
+    ],
+  },
+  {
+    id: 'ragi-porridge',
+    title: 'Ragi (finger millet) porridge',
+    emoji: '🥣',
+    stageIds: ['6-8m', '9-11m', '12-23m'],
+    diets: ['vegan', 'vegetarian', 'non-vegetarian'],
+    prepMins: 15,
+    highlights: ['Calcium', 'Iron', 'Energy'],
+    ingredients: ['Ragi flour (finger millet)', 'Milk or formula', 'Mashed banana or jaggery'],
+    steps: [
+      'Whisk ragi flour into milk with no lumps.',
+      'Cook gently, stirring, until thick and glossy.',
+      'Sweeten lightly with mashed banana and serve warm.',
+    ],
+  },
+  {
+    id: 'idli-mash',
+    title: 'Soft idli mash',
+    emoji: '🍥',
+    stageIds: ['9-11m', '12-23m', '24m+'],
+    diets: ['vegan', 'vegetarian', 'non-vegetarian'],
+    prepMins: 10,
+    highlights: ['Energy', 'Easy to digest'],
+    ingredients: ['Steamed idli', 'A little milk or curd', 'Mashed soft vegetables'],
+    steps: [
+      'Mash a steamed idli with a little milk or curd.',
+      'Mix in soft mashed vegetables.',
+      'Serve warm and soft.',
+    ],
+  },
+
+  // ---- Middle Eastern ----
+  {
+    id: 'hummus-mash',
+    title: 'Smooth hummus',
+    emoji: '🥙',
+    stageIds: ['9-11m', '12-23m', '24m+'],
+    diets: ['vegan', 'vegetarian', 'non-vegetarian'],
+    prepMins: 10,
+    highlights: ['Protein', 'Iron', 'Healthy fats'],
+    ingredients: ['Cooked chickpeas', 'Tahini (sesame paste)', 'A little olive oil', 'Lemon juice'],
+    steps: [
+      'Blend chickpeas with tahini and a little olive oil until very smooth.',
+      'Add a small squeeze of lemon and thin with water as needed.',
+      'Serve as a dip with soft bread or vegetables.',
+    ],
+  },
+  {
+    id: 'lentil-soup',
+    title: 'Red lentil soup (shorba)',
+    emoji: '🍲',
+    stageIds: ['6-8m', '9-11m', '12-23m', '24m+'],
+    diets: ['vegan', 'vegetarian', 'non-vegetarian'],
+    prepMins: 25,
+    highlights: ['Iron', 'Protein'],
+    ingredients: [
+      'Red lentils',
+      'Carrot',
+      'Cumin',
+      'Water or stock (no salt)',
+      'A little olive oil',
+    ],
+    steps: [
+      'Simmer lentils and carrot with a pinch of cumin until soft.',
+      'Blend smooth and thin to a soupy texture.',
+      'Cool to lukewarm before serving.',
+    ],
+  },
+  {
+    id: 'labneh-fruit',
+    title: 'Labneh with soft fruit',
+    emoji: '🍶',
+    stageIds: ['12-23m', '24m+'],
+    diets: ['vegetarian', 'non-vegetarian'],
+    prepMins: 5,
+    highlights: ['Calcium', 'Protein', 'Probiotics'],
+    ingredients: ['Labneh (strained yogurt)', 'Mashed soft fruit', 'A drizzle of olive oil'],
+    steps: ['Spoon labneh into a bowl.', 'Swirl in mashed fruit.', 'Serve chilled.'],
+  },
+
+  // ---- European / British ----
+  {
+    id: 'veg-risotto',
+    title: 'Soft pea & cheese risotto',
+    emoji: '🍚',
+    stageIds: ['9-11m', '12-23m', '24m+'],
+    diets: ['vegetarian', 'non-vegetarian'],
+    prepMins: 25,
+    highlights: ['Energy', 'Calcium', 'Protein'],
+    ingredients: [
+      'Risotto or short-grain rice',
+      'Steamed peas',
+      'Grated cheese',
+      'Stock (no salt)',
+    ],
+    steps: [
+      'Cook rice slowly in unsalted stock until very soft and creamy.',
+      'Stir in steamed peas and a little grated cheese.',
+      'Mash lightly to a safe texture and serve warm.',
+    ],
+  },
+  {
+    id: 'pasta-tomato',
+    title: 'Soft pasta with tomato & veg',
+    emoji: '🍝',
+    stageIds: ['9-11m', '12-23m', '24m+'],
+    diets: ['vegan', 'vegetarian', 'non-vegetarian'],
+    prepMins: 20,
+    highlights: ['Energy', 'Vitamin C', 'Fibre'],
+    ingredients: ['Small soft pasta', 'Ripe tomato', 'Courgette (zucchini)', 'A little olive oil'],
+    steps: [
+      'Cook pasta until very soft.',
+      'Simmer chopped tomato and courgette into a soft sauce with a little oil.',
+      'Mix and mash lightly to a safe texture.',
+    ],
+  },
+  {
+    id: 'shepherds-veg',
+    title: 'Cottage-style lentil & potato bake',
+    emoji: '🥔',
+    stageIds: ['12-23m', '24m+'],
+    diets: ['vegan', 'vegetarian', 'non-vegetarian'],
+    prepMins: 30,
+    highlights: ['Iron', 'Protein', 'Energy'],
+    ingredients: ['Cooked lentils', 'Mashed potato', 'Soft cooked carrot and peas', 'A little oil'],
+    steps: [
+      'Mix cooked lentils with soft carrot and peas.',
+      'Top with mashed potato and warm through.',
+      'Serve soft, mashing further if needed.',
+    ],
+  },
+
+  // ---- American ----
+  {
+    id: 'sweet-potato-mash',
+    title: 'Mashed sweet potato',
+    emoji: '🍠',
+    stageIds: ['6-8m', '9-11m', '12-23m'],
+    diets: ['vegan', 'vegetarian', 'non-vegetarian'],
+    prepMins: 20,
+    highlights: ['Vitamin A', 'Energy', 'Fibre'],
+    ingredients: ['Sweet potato', 'A little milk or formula', 'A pinch of cinnamon'],
+    steps: [
+      'Roast or boil sweet potato until very soft.',
+      'Mash with a little milk to a smooth purée.',
+      'Add a tiny pinch of cinnamon if liked.',
+    ],
+  },
+  {
+    id: 'peanut-banana-toast',
+    title: 'Banana & smooth peanut toast',
+    emoji: '🥜',
+    stageIds: ['12-23m', '24m+'],
+    diets: ['vegan', 'vegetarian', 'non-vegetarian'],
+    prepMins: 5,
+    highlights: ['Energy', 'Protein', 'Healthy fats'],
+    ingredients: ['Soft bread or toast', 'Smooth peanut butter (thinned)', 'Mashed banana'],
+    steps: [
+      'Spread a thin layer of smooth peanut butter, thinned with a little water.',
+      'Top with mashed banana.',
+      'Cut into soft, safe strips. Introduce peanut early only per pediatric advice.',
+    ],
+  },
+  {
+    id: 'scrambled-egg-cheese',
+    title: 'Soft scrambled egg & cheese',
+    emoji: '🍳',
+    stageIds: ['9-11m', '12-23m', '24m+'],
+    diets: ['vegetarian', 'non-vegetarian'],
+    prepMins: 10,
+    highlights: ['Protein', 'Choline', 'Calcium'],
+    ingredients: ['Egg', 'A little grated cheese', 'A splash of milk', 'A little butter or oil'],
+    steps: [
+      'Whisk egg with a splash of milk.',
+      'Cook gently with a little butter until fully set and soft.',
+      'Fold in a little grated cheese and serve in small pieces.',
+    ],
+  },
 ];
 
 export function recipesFor(stageId: string, diet: DietPreference): Recipe[] {
@@ -244,15 +482,75 @@ const STOP_WORDS = new Set([
   'thin',
 ]);
 
-/** Normalise a phrase into meaningful keyword tokens. */
+/**
+ * Maps common ingredient names (including regional / international names) to the
+ * canonical tokens used in recipe ingredient lists, so a parent typing "soya
+ * chunks", "curd", "courgette" or "atta" still matches the right recipes.
+ * Keys and values are single lowercase tokens (post-tokenisation).
+ */
+const SYNONYMS: Record<string, string[]> = {
+  soya: ['soy', 'soya', 'tofu'],
+  soy: ['soy', 'soya', 'tofu'],
+  tofu: ['tofu', 'soy', 'soya'],
+  chunk: ['soya', 'soy'],
+  paneer: ['paneer', 'cottage', 'cheese'],
+  cottage: ['cottage', 'paneer', 'cheese'],
+  curd: ['curd', 'yogurt', 'yoghurt'],
+  yoghurt: ['yogurt', 'yoghurt', 'curd'],
+  yogurt: ['yogurt', 'yoghurt', 'curd'],
+  labneh: ['labneh', 'yogurt'],
+  dal: ['dal', 'lentil', 'moong'],
+  daal: ['dal', 'lentil', 'moong'],
+  lentil: ['lentil', 'dal', 'moong'],
+  moong: ['moong', 'dal', 'lentil'],
+  chickpea: ['chickpea'],
+  channa: ['chickpea'],
+  chana: ['chickpea'],
+  garbanzo: ['chickpea'],
+  ragi: ['ragi'],
+  millet: ['ragi', 'millet'],
+  jaggery: ['jaggery', 'banana'],
+  ghee: ['ghee', 'oil', 'butter'],
+  butter: ['butter', 'oil', 'ghee'],
+  courgette: ['courgette', 'zucchini'],
+  zucchini: ['zucchini', 'courgette'],
+  capsicum: ['pepper'],
+  brinjal: ['aubergine', 'eggplant'],
+  aubergine: ['aubergine', 'eggplant'],
+  eggplant: ['eggplant', 'aubergine'],
+  atta: ['wheat', 'flour'],
+  wheat: ['wheat', 'flour'],
+  tahini: ['tahini', 'sesame'],
+  sesame: ['sesame', 'tahini'],
+  peanut: ['peanut'],
+  groundnut: ['peanut'],
+  idli: ['idli'],
+  hummus: ['chickpea'],
+  rice: ['rice', 'risotto'],
+  risotto: ['risotto', 'rice'],
+  pasta: ['pasta'],
+  noodle: ['pasta'],
+  sweetpotato: ['sweet', 'potato'],
+  shakarkandi: ['sweet', 'potato'],
+};
+
+/** Normalise a phrase into meaningful keyword tokens, expanding known synonyms. */
 function tokenize(text: string): string[] {
-  return text
+  const base = text
     .toLowerCase()
     .replace(/[^a-z\s/]/g, ' ')
     .split(/[\s/]+/)
     .map((w) => w.trim())
     .filter((w) => w.length > 2 && !STOP_WORDS.has(w))
     .map((w) => (w.endsWith('es') ? w.slice(0, -2) : w.endsWith('s') ? w.slice(0, -1) : w));
+
+  const expanded = new Set<string>();
+  for (const word of base) {
+    expanded.add(word);
+    const syns = SYNONYMS[word];
+    if (syns) for (const s of syns) expanded.add(s);
+  }
+  return [...expanded];
 }
 
 /** Split a parent's free-text list ("banana, oats and milk") into terms. */
@@ -288,24 +586,31 @@ export function suggestFromIngredients(
     const missing: string[] = [];
     /** Non-staple ingredients the parent did not list — these "count against" the recipe. */
     let missingCore = 0;
+    /** Total non-staple ingredients the recipe needs. */
+    let coreTotal = 0;
 
     for (const ingredient of recipe.ingredients) {
       const tokens = tokenize(ingredient);
       if (tokens.length === 0) continue;
+      const isStaple = tokens.every((t) => PANTRY_STAPLES.has(t));
+      if (!isStaple) coreTotal += 1;
       const hit = tokens.some((t) => parentTokens.has(t));
       if (hit) {
         matched.push(ingredient);
       } else {
         missing.push(ingredient);
-        if (!tokens.every((t) => PANTRY_STAPLES.has(t))) missingCore += 1;
+        if (!isStaple) missingCore += 1;
       }
     }
 
     if (matched.length === 0) continue;
 
-    // Keep suggestions grounded in what the parent listed: only recipes they
-    // can make now (no missing core ingredients) or that need at most one more.
-    if (missingCore > 1) continue;
+    // Keep suggestions grounded in what the parent listed. Allow more missing
+    // core ingredients for larger recipes, so dishes like a multi-ingredient
+    // khichdi still surface when the parent has its defining ingredients, while
+    // small recipes stay strict.
+    const allowedMissing = Math.max(1, Math.ceil(coreTotal / 3));
+    if (missingCore > allowedMissing) continue;
 
     const considered = matched.length + missing.length || 1;
     suggestions.push({
