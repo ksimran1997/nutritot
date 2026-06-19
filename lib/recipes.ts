@@ -188,9 +188,18 @@ export interface RecipeSuggestion {
   missing: string[];
   /** 0–1 share of recipe ingredients the parent already has. */
   coverage: number;
+  /** True when the parent already has every ingredient this recipe needs. */
+  canMakeNow: boolean;
   /** True when the recipe suits the baby's current age stage. */
   inStage: boolean;
 }
+
+/**
+ * Some recipe ingredients are basic staples most kitchens already have. We
+ * don't penalise a recipe for "needing" these when deciding whether a parent
+ * can make it from what they listed.
+ */
+const PANTRY_STAPLES = new Set(['water', 'oil', 'stock', 'milk', 'formula']);
 
 /** Common words to ignore when comparing free-text ingredients. */
 const STOP_WORDS = new Set([
@@ -255,9 +264,12 @@ export function parseIngredientInput(input: string): string[] {
 }
 
 /**
- * Rank recipes by how well their ingredients overlap the ingredients a parent
- * has on hand. Results are filtered to the baby's diet and sorted with
- * age-appropriate, higher-coverage recipes first. Educational suggestions only.
+ * Rank recipes by how well they can be made from the ingredients a parent
+ * actually listed. Only recipes whose main ingredients are mostly covered by
+ * the parent's input are returned, so suggestions stay grounded in what they
+ * have rather than introducing extra ingredients. Filtered to the baby's diet
+ * and sorted with ready-to-make, age-appropriate recipes first.
+ * Educational suggestions only.
  */
 export function suggestFromIngredients(
   rawIngredients: string[],
@@ -274,16 +286,26 @@ export function suggestFromIngredients(
 
     const matched: string[] = [];
     const missing: string[] = [];
+    /** Non-staple ingredients the parent did not list — these "count against" the recipe. */
+    let missingCore = 0;
 
     for (const ingredient of recipe.ingredients) {
       const tokens = tokenize(ingredient);
       if (tokens.length === 0) continue;
       const hit = tokens.some((t) => parentTokens.has(t));
-      if (hit) matched.push(ingredient);
-      else missing.push(ingredient);
+      if (hit) {
+        matched.push(ingredient);
+      } else {
+        missing.push(ingredient);
+        if (!tokens.every((t) => PANTRY_STAPLES.has(t))) missingCore += 1;
+      }
     }
 
     if (matched.length === 0) continue;
+
+    // Keep suggestions grounded in what the parent listed: only recipes they
+    // can make now (no missing core ingredients) or that need at most one more.
+    if (missingCore > 1) continue;
 
     const considered = matched.length + missing.length || 1;
     suggestions.push({
@@ -291,11 +313,13 @@ export function suggestFromIngredients(
       matched,
       missing,
       coverage: matched.length / considered,
+      canMakeNow: missingCore === 0,
       inStage: recipe.stageIds.includes(stageId),
     });
   }
 
   return suggestions.sort((a, b) => {
+    if (a.canMakeNow !== b.canMakeNow) return a.canMakeNow ? -1 : 1;
     if (a.inStage !== b.inStage) return a.inStage ? -1 : 1;
     if (b.matched.length !== a.matched.length) return b.matched.length - a.matched.length;
     return b.coverage - a.coverage;

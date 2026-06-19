@@ -77,8 +77,8 @@ export default function SuggestScreen() {
           <View className="flex-row items-center gap-2">
             <Sparkles color={accent} size={18} />
             <Text className="text-foreground flex-1 text-sm">
-              List what you have at home — we&apos;ll suggest age- and diet-appropriate ideas for{' '}
-              {profile.name}.
+              List what you have at home — we&apos;ll only suggest ideas you can make from those
+              ingredients, matched to {profile.name}&apos;s age and diet.
             </Text>
           </View>
 
@@ -131,19 +131,19 @@ export default function SuggestScreen() {
           ) : suggestions.length === 0 ? (
             <Card variant="secondary">
               <Card.Body className="gap-1">
-                <Text className="text-foreground font-semibold">No matches yet</Text>
+                <Text className="text-foreground font-semibold">Nothing matches yet</Text>
                 <Text className="text-muted text-sm">
-                  Try common staples like banana, oats, lentils, or carrot — or browse all ideas in
-                  the Recipes tab.
+                  We only show ideas you can make from what you listed. Add another ingredient or
+                  two (e.g. banana, oats, lentils, carrot), or browse all ideas in the Recipes tab.
                 </Text>
               </Card.Body>
             </Card>
           ) : (
             <View className="gap-3">
               <Text className="text-foreground px-1 text-base font-semibold">
-                {suggestions.length} idea{suggestions.length === 1 ? '' : 's'} you can make
+                {suggestions.length} idea{suggestions.length === 1 ? '' : 's'} from your ingredients
               </Text>
-              {suggestions.map(({ recipe, matched, missing, inStage }) => (
+              {suggestions.map(({ recipe, matched, missing, inStage, canMakeNow }) => (
                 <Pressable key={recipe.id} onPress={() => router.push(`/recipe/${recipe.id}`)}>
                   <Card>
                     <Card.Body className="gap-3">
@@ -154,6 +154,11 @@ export default function SuggestScreen() {
                             <Text className="text-foreground flex-1 font-semibold">
                               {recipe.title}
                             </Text>
+                            {canMakeNow ? (
+                              <Chip variant="soft">
+                                <Chip.Label>Ready to make</Chip.Label>
+                              </Chip>
+                            ) : null}
                             {!inStage && (
                               <Chip variant="tertiary">
                                 <Chip.Label>Other age</Chip.Label>
@@ -185,8 +190,8 @@ export default function SuggestScreen() {
           )}
 
           <Text className="text-muted px-1 text-center text-[11px] leading-4">
-            Suggestions match your ingredients to curated ideas. Always check for allergies, cut
-            food to safe sizes, and follow your pediatrician&apos;s advice.
+            Ideas are matched to what you list (plus basic staples like water or oil). Always check
+            for allergies, cut food to safe sizes, and follow your pediatrician&apos;s advice.
           </Text>
         </ScrollView>
       </KeyboardAvoidingView>
