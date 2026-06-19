@@ -99,7 +99,7 @@ export function AddMealSheet({ isOpen, onOpenChange }: AddMealSheetProps) {
           contentContainerClassName="h-full"
         >
           <BottomSheetScrollView keyboardShouldPersistTaps="handled">
-            <View className="gap-5 px-1 pb-10">
+            <View className="gap-5 px-1 pb-4">
               <BottomSheet.Title>Log a meal</BottomSheet.Title>
 
               <TextField isRequired>
@@ -211,12 +211,14 @@ export function AddMealSheet({ isOpen, onOpenChange }: AddMealSheetProps) {
                   ) : null}
                 </View>
               ) : null}
-
-              <Button isDisabled={!canSave} onPress={handleSave} size="lg">
-                <Button.Label>Add meal</Button.Label>
-              </Button>
             </View>
           </BottomSheetScrollView>
+
+          <View className="border-border bg-surface border-t px-1 pb-safe-offset-3 pt-3">
+            <Button isDisabled={!canSave} onPress={handleSave} size="lg">
+              <Button.Label>Add meal</Button.Label>
+            </Button>
+          </View>
         </BottomSheet.Content>
       </BottomSheet.Portal>
     </BottomSheet>
