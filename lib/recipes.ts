@@ -179,3 +179,125 @@ export const RECIPES: Recipe[] = [
 export function recipesFor(stageId: string, diet: DietPreference): Recipe[] {
   return RECIPES.filter((r) => r.stageIds.includes(stageId) && r.diets.includes(diet));
 }
+
+export interface RecipeSuggestion {
+  recipe: Recipe;
+  /** How many of the parent's ingredients this recipe uses. */
+  matched: string[];
+  /** Recipe ingredients the parent did not list. */
+  missing: string[];
+  /** 0–1 share of recipe ingredients the parent already has. */
+  coverage: number;
+  /** True when the recipe suits the baby's current age stage. */
+  inStage: boolean;
+}
+
+/** Common words to ignore when comparing free-text ingredients. */
+const STOP_WORDS = new Set([
+  'a',
+  'an',
+  'the',
+  'of',
+  'and',
+  'or',
+  'to',
+  'with',
+  'fresh',
+  'ripe',
+  'small',
+  'large',
+  'little',
+  'cooked',
+  'boiled',
+  'steamed',
+  'soft',
+  'firm',
+  'plain',
+  'some',
+  'no',
+  'salt',
+  'water',
+  'cup',
+  'cups',
+  'tbsp',
+  'tsp',
+  'tablespoon',
+  'teaspoon',
+  'g',
+  'gram',
+  'grams',
+  'ml',
+  'piece',
+  'pieces',
+  'slice',
+  'slices',
+  'drizzle',
+  'thin',
+]);
+
+/** Normalise a phrase into meaningful keyword tokens. */
+function tokenize(text: string): string[] {
+  return text
+    .toLowerCase()
+    .replace(/[^a-z\s/]/g, ' ')
+    .split(/[\s/]+/)
+    .map((w) => w.trim())
+    .filter((w) => w.length > 2 && !STOP_WORDS.has(w))
+    .map((w) => (w.endsWith('es') ? w.slice(0, -2) : w.endsWith('s') ? w.slice(0, -1) : w));
+}
+
+/** Split a parent's free-text list ("banana, oats and milk") into terms. */
+export function parseIngredientInput(input: string): string[] {
+  return input
+    .split(/[,\n;]+|\band\b/i)
+    .map((s) => s.trim())
+    .filter(Boolean);
+}
+
+/**
+ * Rank recipes by how well their ingredients overlap the ingredients a parent
+ * has on hand. Results are filtered to the baby's diet and sorted with
+ * age-appropriate, higher-coverage recipes first. Educational suggestions only.
+ */
+export function suggestFromIngredients(
+  rawIngredients: string[],
+  diet: DietPreference,
+  stageId: string,
+): RecipeSuggestion[] {
+  const parentTokens = new Set(rawIngredients.flatMap(tokenize));
+  if (parentTokens.size === 0) return [];
+
+  const suggestions: RecipeSuggestion[] = [];
+
+  for (const recipe of RECIPES) {
+    if (!recipe.diets.includes(diet)) continue;
+
+    const matched: string[] = [];
+    const missing: string[] = [];
+
+    for (const ingredient of recipe.ingredients) {
+      const tokens = tokenize(ingredient);
+      if (tokens.length === 0) continue;
+      const hit = tokens.some((t) => parentTokens.has(t));
+      if (hit) matched.push(ingredient);
+      else missing.push(ingredient);
+    }
+
+    if (matched.length === 0) continue;
+
+    const considered = matched.length + missing.length || 1;
+    suggestions.push({
+      recipe,
+      matched,
+      missing,
+      coverage: matched.length / considered,
+      inStage: recipe.stageIds.includes(stageId),
+    });
+  }
+
+  return suggestions.sort((a, b) => {
+    if (a.inStage !== b.inStage) return a.inStage ? -1 : 1;
+    if (b.matched.length !== a.matched.length) return b.matched.length - a.matched.length;
+    return b.coverage - a.coverage;
+  });
+}

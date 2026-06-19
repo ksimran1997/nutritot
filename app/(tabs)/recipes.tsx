@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { Pressable, ScrollView, View } from 'react-native';
-import { ChevronRight, Clock } from 'lucide-react-native';
+import { ChevronRight, Clock, Sparkles } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 import { Card, Chip, Text, useThemeColor } from 'heroui-native';
 
@@ -12,7 +12,7 @@ import { DIET_LABELS } from '@/lib/utils';
 export default function RecipesScreen() {
   const profile = useBabyStore((s) => s.profile);
   const router = useRouter();
-  const [muted] = useThemeColor(['muted']);
+  const [muted, accent] = useThemeColor(['muted', 'accent']);
 
   const stage = useMemo(
     () => (profile ? getAgeStage(getAgeMonths(profile.birthDate)) : AGE_STAGES[0]),
@@ -45,6 +45,23 @@ export default function RecipesScreen() {
             <Text className="text-muted text-sm">{stage.feedingNote}</Text>
           </Card.Body>
         </Card>
+
+        <Pressable onPress={() => router.push('/suggest')}>
+          <Card>
+            <Card.Body className="flex-row items-center gap-3">
+              <View className="bg-peach-soft h-10 w-10 items-center justify-center rounded-full">
+                <Sparkles color={accent} size={20} />
+              </View>
+              <View className="flex-1 gap-0.5">
+                <Text className="text-foreground font-semibold">Suggest from ingredients</Text>
+                <Text className="text-muted text-xs">
+                  Enter what you have and get matching food ideas
+                </Text>
+              </View>
+              <ChevronRight color={muted} size={18} />
+            </Card.Body>
+          </Card>
+        </Pressable>
 
         <Text className="text-foreground px-1 text-base font-semibold">
           Recommended for {profile.name}
