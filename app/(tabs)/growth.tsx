@@ -8,7 +8,12 @@ import { AddGrowthSheet } from '@/components/AddGrowthSheet';
 import { GrowthChart } from '@/components/GrowthChart';
 import { SegmentedControl } from '@/components/SegmentedControl';
 import { useBabyStore } from '@/lib/store';
-import { estimatePercentileBand, type GrowthMetric } from '@/lib/growth';
+import {
+  estimatePercentile,
+  estimatePercentileBand,
+  ordinal,
+  type GrowthMetric,
+} from '@/lib/growth';
 import { getAgeMonths } from '@/lib/nutrition';
 
 export default function GrowthScreen() {
@@ -30,14 +35,18 @@ export default function GrowthScreen() {
   const chartWidth = Math.min(width, 520) - 40 - 32; // screen padding + card padding
   const ageMonths = getAgeMonths(profile.birthDate);
 
+  const latestValue = latest && (metric === 'weight' ? latest.weightKg : latest.heightCm);
+
   const latestBand =
     latest &&
-    estimatePercentileBand(
-      metric,
-      profile.sex,
-      latest.ageMonths,
-      metric === 'weight' ? latest.weightKg : latest.heightCm,
-    );
+    latestValue !== undefined &&
+    latestValue > 0 &&
+    estimatePercentileBand(metric, profile.sex, latest.ageMonths, latestValue);
+
+  const latestPercentile =
+    latest && latestValue !== undefined && latestValue > 0
+      ? estimatePercentile(metric, profile.sex, latest.ageMonths, latestValue)
+      : undefined;
 
   return (
     <View className="bg-background flex-1">
@@ -74,14 +83,28 @@ export default function GrowthScreen() {
           </Card.Body>
         </Card>
 
-        {latest && latestBand ? (
+        {latest && latestBand && latestPercentile !== undefined ? (
           <Card variant="secondary">
-            <Card.Body className="gap-1">
-              <Text className="text-foreground text-sm font-semibold">
-                Latest {metric}:{' '}
-                {metric === 'weight' ? `${latest.weightKg} kg` : `${latest.heightCm} cm`}
+            <Card.Body className="gap-2">
+              <View className="flex-row items-center justify-between gap-3">
+                <Text className="text-foreground text-sm font-semibold">
+                  Latest {metric}:{' '}
+                  {metric === 'weight' ? `${latest.weightKg} kg` : `${latest.heightCm} cm`}
+                </Text>
+                <View className="bg-accent/15 rounded-full px-3 py-1">
+                  <Text className="text-accent text-sm font-semibold">
+                    ~{ordinal(latestPercentile)} pct
+                  </Text>
+                </View>
+              </View>
+              <Text className="text-muted text-sm">
+                Around the {ordinal(latestPercentile)} percentile for a{' '}
+                {profile.sex === 'boy' ? 'boy' : 'girl'} aged {latest.ageMonths} months —{' '}
+                {latestBand.toLowerCase()}.
               </Text>
-              <Text className="text-muted text-sm">{latestBand} for age.</Text>
+              <Text className="text-muted text-xs">
+                Educational estimate from WHO reference bands, not a clinical assessment.
+              </Text>
             </Card.Body>
           </Card>
         ) : null}

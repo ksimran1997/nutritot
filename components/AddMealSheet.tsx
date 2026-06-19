@@ -214,7 +214,7 @@ export function AddMealSheet({ isOpen, onOpenChange }: AddMealSheetProps) {
             </View>
           </BottomSheetScrollView>
 
-          <View className="border-border bg-surface border-t px-1 pb-safe-offset-3 pt-3">
+          <View className="border-border bg-surface pb-safe-offset-3 border-t px-1 pt-3">
             <Button isDisabled={!canSave} onPress={handleSave} size="lg">
               <Button.Label>Add meal</Button.Label>
             </Button>

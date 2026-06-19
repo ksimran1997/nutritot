@@ -114,3 +114,54 @@ export function estimatePercentileBand(
   if (value <= p97) return 'Upper healthy range';
   return 'Above typical range';
 }
+
+/**
+ * Approximate numeric percentile (1–99) for a measured value at a given age,
+ * interpolating between the WHO 3rd/50th/97th reference points. Educational
+ * estimate only — not a clinical assessment.
+ */
+export function estimatePercentile(
+  metric: GrowthMetric,
+  sex: Sex,
+  month: number,
+  value: number,
+): number {
+  const bands = getPercentileBands(metric, sex);
+  const p3 = valueAtMonth(bands, month, 'p3');
+  const p50 = valueAtMonth(bands, month, 'p50');
+  const p97 = valueAtMonth(bands, month, 'p97');
+
+  let pct: number;
+  if (value <= p3) {
+    // Extrapolate below the 3rd percentile, clamped to 1.
+    const span = p50 - p3 || 1;
+    pct = 3 + ((value - p3) / span) * (50 - 3);
+  } else if (value <= p50) {
+    const t = (value - p3) / (p50 - p3 || 1);
+    pct = interp(3, 50, t);
+  } else if (value <= p97) {
+    const t = (value - p50) / (p97 - p50 || 1);
+    pct = interp(50, 97, t);
+  } else {
+    const span = p97 - p50 || 1;
+    pct = 97 + ((value - p97) / span) * (99 - 97);
+  }
+
+  return Math.max(1, Math.min(99, Math.round(pct)));
+}
+
+/** Human-friendly ordinal suffix, e.g. 1 -> "1st", 23 -> "23rd". */
+export function ordinal(n: number): string {
+  const mod100 = n % 100;
+  if (mod100 >= 11 && mod100 <= 13) return `${n}th`;
+  switch (n % 10) {
+    case 1:
+      return `${n}st`;
+    case 2:
+      return `${n}nd`;
+    case 3:
+      return `${n}rd`;
+    default:
+      return `${n}th`;
+  }
+}
