@@ -139,7 +139,6 @@ export default function RootLayout() {
           <Stack.Screen name="(tabs)" />
           <Stack.Screen name="onboarding" options={{ presentation: 'modal' }} />
           <Stack.Screen name="recipe/[id]" options={{ presentation: 'modal' }} />
-          <Stack.Screen name="suggest" options={{ presentation: 'modal' }} />
         </Stack>
       </HeroUINativeProvider>
     </GestureHandlerRootView>

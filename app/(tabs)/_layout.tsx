@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Apple, Baby, LineChart, User } from 'lucide-react-native';
+import { Apple, Baby, LineChart, Sparkles, User } from 'lucide-react-native';
 import { Redirect, Tabs, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useThemeColor } from 'heroui-native';
@@ -69,6 +69,13 @@ export default function TabLayout() {
           options={{
             title: 'Recipes',
             tabBarIcon: ({ color, size }) => <Apple color={color} size={size ?? 24} />,
+          }}
+        />
+        <Tabs.Screen
+          name="suggest"
+          options={{
+            title: 'Suggest',
+            tabBarIcon: ({ color, size }) => <Sparkles color={color} size={size ?? 24} />,
           }}
         />
         <Tabs.Screen

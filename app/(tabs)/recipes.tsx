@@ -55,7 +55,7 @@ export default function RecipesScreen() {
               <View className="flex-1 gap-0.5">
                 <Text className="text-foreground font-semibold">Suggest from ingredients</Text>
                 <Text className="text-muted text-xs">
-                  Enter what you have and get matching food ideas
+                  Enter what you have in the Suggest tab to get matching ideas
                 </Text>
               </View>
               <ChevronRight color={muted} size={18} />

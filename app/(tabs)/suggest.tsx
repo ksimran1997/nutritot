@@ -1,9 +1,8 @@
 import { useMemo, useState } from 'react';
 import { KeyboardAvoidingView, Platform, Pressable, ScrollView, View } from 'react-native';
-import { ChevronRight, Sparkles, X } from 'lucide-react-native';
-import { Stack, useRouter } from 'expo-router';
+import { ChevronRight, Sparkles } from 'lucide-react-native';
+import { useRouter } from 'expo-router';
 import {
-  Button,
   Card,
   Chip,
   Description,
@@ -37,12 +36,7 @@ const QUICK_INGREDIENTS = [
 export default function SuggestScreen() {
   const profile = useBabyStore((s) => s.profile);
   const router = useRouter();
-  const [foreground, background, muted, accent] = useThemeColor([
-    'foreground',
-    'background',
-    'muted',
-    'accent',
-  ]);
+  const [muted, accent] = useThemeColor(['muted', 'accent']);
 
   const [input, setInput] = useState('');
 
@@ -72,26 +66,12 @@ export default function SuggestScreen() {
 
   return (
     <View className="bg-background flex-1">
-      <Stack.Screen
-        options={{
-          headerShown: true,
-          title: 'Suggest from ingredients',
-          headerStyle: { backgroundColor: background },
-          headerShadowVisible: false,
-          headerTitleStyle: { color: foreground },
-          headerLeft: () => (
-            <Button isIconOnly variant="ghost" onPress={() => router.back()}>
-              <X color={foreground} size={20} />
-            </Button>
-          ),
-        }}
-      />
       <KeyboardAvoidingView
         className="flex-1"
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
         <ScrollView
-          contentContainerClassName="px-5 pt-3 pb-16 gap-4"
+          contentContainerClassName="px-5 pt-4 pb-16 gap-4"
           keyboardShouldPersistTaps="handled"
         >
           <View className="flex-row items-center gap-2">
