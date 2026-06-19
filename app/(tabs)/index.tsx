@@ -113,8 +113,9 @@ export default function TodayScreen() {
                   <View className="flex-1 gap-0.5">
                     <Text className="text-foreground font-medium">{m.name}</Text>
                     <Text className="text-muted text-xs">
-                      {MEAL_LABELS[m.type]} · {Math.round(m.calories)} kcal · {m.protein}g protein ·{' '}
-                      {m.iron}mg iron · {m.calcium}mg calcium
+                      {MEAL_LABELS[m.type]}
+                      {m.portion ? ` · ${m.portion}` : ''} · {Math.round(m.calories)} kcal ·{' '}
+                      {m.protein}g protein · {m.iron}mg iron · {m.calcium}mg calcium
                     </Text>
                   </View>
                   <Pressable

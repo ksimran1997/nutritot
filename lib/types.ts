@@ -16,6 +16,7 @@ export interface MealEntry {
   date: string; // ISO date (yyyy-MM-dd)
   type: MealType;
   name: string;
+  portion?: string;
   calories: number;
   protein: number; // grams
   iron: number; // mg
