@@ -1,6 +1,6 @@
-import { differenceInDays, differenceInMonths } from 'date-fns';
+import { differenceInDays, differenceInMonths, eachDayOfInterval, format, subDays } from 'date-fns';
 
-import type { NutritionTargets } from '@/lib/types';
+import type { MealEntry, NutrientKey, NutritionTargets } from '@/lib/types';
 
 export interface AgeStage {
   id: string;
@@ -116,3 +116,64 @@ export const NUTRIENT_META: Record<
   iron: { label: 'Iron', unit: 'mg', colorClass: 'bg-grape' },
   calcium: { label: 'Calcium', unit: 'mg', colorClass: 'bg-sky' },
 };
+
+export type NutritionRange = 'week' | 'month';
+
+export interface DailyNutrition {
+  date: string; // yyyy-MM-dd
+  value: number;
+}
+
+export interface NutritionSeries {
+  nutrient: NutrientKey;
+  /** one point per day across the range, oldest first */
+  points: DailyNutrition[];
+  /** target/day for the nutrient at the baby's current age */
+  target: number;
+  /** mean intake across days that had at least one logged meal */
+  averageActive: number;
+  /** number of days with at least one logged meal in the range */
+  activeDays: number;
+}
+
+/**
+ * Build a per-day intake series for a nutrient across the last 7 (week) or
+ * 30 (month) days. Days with no logged meals are included with a value of 0.
+ */
+export function buildNutritionSeries(
+  meals: MealEntry[],
+  nutrient: NutrientKey,
+  range: NutritionRange,
+  ageMonths: number,
+  today: Date = new Date(),
+): NutritionSeries {
+  const span = range === 'week' ? 7 : 30;
+  const start = subDays(today, span - 1);
+  const days = eachDayOfInterval({ start, end: today });
+
+  const byDay = new Map<string, number>();
+  const loggedDays = new Set<string>();
+  for (const m of meals) {
+    const key = m.date;
+    byDay.set(key, (byDay.get(key) ?? 0) + m[nutrient]);
+    loggedDays.add(key);
+  }
+
+  const points: DailyNutrition[] = days.map((d) => {
+    const key = format(d, 'yyyy-MM-dd');
+    return { date: key, value: byDay.get(key) ?? 0 };
+  });
+
+  const activeKeys = points.filter((p) => loggedDays.has(p.date));
+  const activeDays = activeKeys.length;
+  const averageActive =
+    activeDays > 0 ? activeKeys.reduce((s, p) => s + p.value, 0) / activeDays : 0;
+
+  return {
+    nutrient,
+    points,
+    target: getNutritionTargets(ageMonths)[nutrient],
+    averageActive,
+    activeDays,
+  };
+}

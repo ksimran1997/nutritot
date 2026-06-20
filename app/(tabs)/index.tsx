@@ -1,12 +1,21 @@
 import { useMemo, useState } from 'react';
-import { Pressable, ScrollView, View } from 'react-native';
+import { Pressable, ScrollView, useWindowDimensions, View } from 'react-native';
 import { Plus, Trash2 } from 'lucide-react-native';
 import { Card, Chip, Text, useThemeColor } from 'heroui-native';
 
 import { AddMealSheet } from '@/components/AddMealSheet';
 import { NutrientBar } from '@/components/NutrientBar';
+import { NutritionChart } from '@/components/NutritionChart';
+import { SegmentedControl } from '@/components/SegmentedControl';
 import { useBabyStore } from '@/lib/store';
-import { formatAge, getAgeMonths, getAgeStage, getNutritionTargets } from '@/lib/nutrition';
+import {
+  buildNutritionSeries,
+  formatAge,
+  getAgeMonths,
+  getAgeStage,
+  getNutritionTargets,
+  type NutritionRange,
+} from '@/lib/nutrition';
 import type { MealEntry, NutrientKey } from '@/lib/types';
 import { cn, DIET_LABELS, todayKey } from '@/lib/utils';
 
@@ -17,12 +26,29 @@ const MEAL_LABELS: Record<MealEntry['type'], string> = {
   snack: 'Snack',
 };
 
+const NUTRIENT_BARS: { key: NutrientKey; label: string; unit: string; colorClass: string }[] = [
+  { key: 'calories', label: 'Calories', unit: 'kcal', colorClass: 'bg-peach' },
+  { key: 'protein', label: 'Protein', unit: 'g', colorClass: 'bg-mint' },
+  { key: 'iron', label: 'Iron', unit: 'mg', colorClass: 'bg-grape' },
+  { key: 'calcium', label: 'Calcium', unit: 'mg', colorClass: 'bg-sky' },
+];
+
+const NUTRIENT_HEX: Record<NutrientKey, string> = {
+  calories: '#e0a26a', // peach
+  protein: '#27b08a', // mint
+  iron: '#a061c4', // grape
+  calcium: '#3aa6d4', // sky
+};
+
 export default function TodayScreen() {
   const profile = useBabyStore((s) => s.profile);
   const meals = useBabyStore((s) => s.meals);
   const removeMeal = useBabyStore((s) => s.removeMeal);
   const [danger] = useThemeColor(['danger']);
+  const { width } = useWindowDimensions();
   const [sheetOpen, setSheetOpen] = useState(false);
+  const [range, setRange] = useState<NutritionRange>('week');
+  const [chartNutrient, setChartNutrient] = useState<NutrientKey>('calories');
 
   const today = todayKey();
   const todaysMeals = useMemo(() => meals.filter((m) => m.date === today), [meals, today]);
@@ -39,18 +65,20 @@ export default function TodayScreen() {
     );
   }, [todaysMeals]);
 
+  const ageMonths = profile ? getAgeMonths(profile.birthDate) : 0;
+
+  const series = useMemo(
+    () => buildNutritionSeries(meals, chartNutrient, range, ageMonths),
+    [meals, chartNutrient, range, ageMonths],
+  );
+
   if (!profile) return null;
 
-  const ageMonths = getAgeMonths(profile.birthDate);
   const stage = getAgeStage(ageMonths);
   const targets = getNutritionTargets(ageMonths);
 
-  const bars: { key: NutrientKey; label: string; unit: string; colorClass: string }[] = [
-    { key: 'calories', label: 'Calories', unit: 'kcal', colorClass: 'bg-peach' },
-    { key: 'protein', label: 'Protein', unit: 'g', colorClass: 'bg-mint' },
-    { key: 'iron', label: 'Iron', unit: 'mg', colorClass: 'bg-grape' },
-    { key: 'calcium', label: 'Calcium', unit: 'mg', colorClass: 'bg-sky' },
-  ];
+  const chartWidth = Math.min(width, 520) - 40 - 32; // screen padding + card padding
+  const chartMeta = NUTRIENT_BARS.find((b) => b.key === chartNutrient)!;
 
   return (
     <View className="bg-background flex-1">
@@ -80,7 +108,7 @@ export default function TodayScreen() {
               <Card.Title>Today&apos;s nutrition</Card.Title>
               <Text className="text-muted text-xs">{todaysMeals.length} logged</Text>
             </View>
-            {bars.map((b) => (
+            {NUTRIENT_BARS.map((b) => (
               <NutrientBar
                 key={b.key}
                 label={b.label}
@@ -102,6 +130,73 @@ export default function TodayScreen() {
               Targets are educational estimates based on WHO guidance for {stage.label}. Always
               follow your pediatrician&apos;s advice.
             </Text>
+          </Card.Body>
+        </Card>
+
+        <Card>
+          <Card.Body className="gap-3">
+            <View className="flex-row items-center justify-between gap-3">
+              <Card.Title>Nutrition trend</Card.Title>
+              <SegmentedControl<NutritionRange>
+                className="w-40"
+                value={range}
+                onChange={setRange}
+                options={[
+                  { value: 'week', label: 'Weekly' },
+                  { value: 'month', label: 'Monthly' },
+                ]}
+              />
+            </View>
+
+            <View className="flex-row flex-wrap gap-2">
+              {NUTRIENT_BARS.map((b) => {
+                const active = b.key === chartNutrient;
+                return (
+                  <Pressable
+                    key={b.key}
+                    onPress={() => setChartNutrient(b.key)}
+                    className={`rounded-full border px-3.5 py-1.5 ${
+                      active ? 'border-accent bg-peach-soft' : 'border-border bg-surface'
+                    }`}
+                  >
+                    <Text
+                      className={`text-sm font-medium ${active ? 'text-accent' : 'text-foreground'}`}
+                    >
+                      {b.label}
+                    </Text>
+                  </Pressable>
+                );
+              })}
+            </View>
+
+            {series.activeDays === 0 ? (
+              <View className="items-center gap-1 py-10">
+                <Text className="text-muted text-sm">No meals logged in this period.</Text>
+                <Text className="text-muted text-xs">
+                  Log meals to see {range === 'week' ? 'the last 7 days' : 'the last 30 days'}.
+                </Text>
+              </View>
+            ) : (
+              <>
+                <NutritionChart
+                  series={series}
+                  range={range}
+                  unit={chartMeta.unit}
+                  barColor={NUTRIENT_HEX[chartNutrient]}
+                  width={chartWidth}
+                />
+                <View className="bg-default/60 flex-row items-center justify-between rounded-xl px-3 py-2.5">
+                  <Text className="text-muted text-xs">
+                    Avg / logged day ({series.activeDays} {series.activeDays === 1 ? 'day' : 'days'}
+                    )
+                  </Text>
+                  <Text className="text-foreground text-sm font-semibold">
+                    {Math.round(series.averageActive)} / {Math.round(series.target)}{' '}
+                    {chartMeta.unit}
+                  </Text>
+                </View>
+              </>
+            )}
           </Card.Body>
         </Card>
 
