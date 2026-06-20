@@ -420,7 +420,7 @@ export function recipesFor(stageId: string, diet: DietPreference): Recipe[] {
 
 export interface RecipeSuggestion {
   recipe: Recipe;
-  /** How many of the parent's ingredients this recipe uses. */
+  /** The parent's own ingredient terms that this recipe uses. */
   matched: string[];
   /** Recipe ingredients the parent did not list. */
   missing: string[];
@@ -489,10 +489,12 @@ const STOP_WORDS = new Set([
  * Keys and values are single lowercase tokens (post-tokenisation).
  */
 const SYNONYMS: Record<string, string[]> = {
-  soya: ['soy', 'soya', 'tofu'],
-  soy: ['soy', 'soya', 'tofu'],
-  tofu: ['tofu', 'soy', 'soya'],
-  chunk: ['soya', 'soy'],
+  // Soya chunks (textured soy protein) are a distinct food from tofu — keep
+  // them separate so "soya chunks" matches soya recipes, not the tofu one.
+  soya: ['soya', 'soy'],
+  soy: ['soy', 'soya'],
+  tofu: ['tofu'],
+  chunk: ['chunk', 'soya', 'soy'],
   paneer: ['paneer', 'cottage', 'cheese'],
   cottage: ['cottage', 'paneer', 'cheese'],
   curd: ['curd', 'yogurt', 'yoghurt'],
@@ -574,7 +576,10 @@ export function suggestFromIngredients(
   diet: DietPreference,
   stageId: string,
 ): RecipeSuggestion[] {
-  const parentTokens = new Set(rawIngredients.flatMap(tokenize));
+  // Track each parent term alongside its tokens so we can report back exactly
+  // what the parent typed (not the recipe's wording) and which terms matched.
+  const parentTerms = rawIngredients.map((term) => ({ term, tokens: new Set(tokenize(term)) }));
+  const parentTokens = new Set(parentTerms.flatMap((t) => [...t.tokens]));
   if (parentTokens.size === 0) return [];
 
   const suggestions: RecipeSuggestion[] = [];
@@ -582,42 +587,47 @@ export function suggestFromIngredients(
   for (const recipe of RECIPES) {
     if (!recipe.diets.includes(diet)) continue;
 
-    const matched: string[] = [];
     const missing: string[] = [];
+    /** Parent terms this recipe actually uses (kept as the parent typed them). */
+    const matchedTerms = new Set<string>();
     /** Non-staple ingredients the parent did not list — these "count against" the recipe. */
     let missingCore = 0;
     /** Total non-staple ingredients the recipe needs. */
     let coreTotal = 0;
+    let matchedCount = 0;
 
     for (const ingredient of recipe.ingredients) {
       const tokens = tokenize(ingredient);
       if (tokens.length === 0) continue;
       const isStaple = tokens.every((t) => PANTRY_STAPLES.has(t));
       if (!isStaple) coreTotal += 1;
-      const hit = tokens.some((t) => parentTokens.has(t));
-      if (hit) {
-        matched.push(ingredient);
+
+      // Which of the parent's terms cover this recipe ingredient?
+      const coveringTerms = parentTerms.filter((p) => tokens.some((t) => p.tokens.has(t)));
+      if (coveringTerms.length > 0) {
+        matchedCount += 1;
+        for (const p of coveringTerms) matchedTerms.add(p.term);
       } else {
         missing.push(ingredient);
         if (!isStaple) missingCore += 1;
       }
     }
 
-    if (matched.length === 0) continue;
+    if (matchedCount === 0) continue;
 
     // Keep suggestions grounded in what the parent listed. Allow more missing
     // core ingredients for larger recipes, so dishes like a multi-ingredient
-    // khichdi still surface when the parent has its defining ingredients, while
-    // small recipes stay strict.
-    const allowedMissing = Math.max(1, Math.ceil(coreTotal / 3));
+    // khichdi still surface when the parent has its defining ingredient(s),
+    // while small recipes stay strict.
+    const allowedMissing = Math.max(2, Math.ceil(coreTotal / 2));
     if (missingCore > allowedMissing) continue;
 
-    const considered = matched.length + missing.length || 1;
+    const considered = coreTotal || 1;
     suggestions.push({
       recipe,
-      matched,
+      matched: [...matchedTerms],
       missing,
-      coverage: matched.length / considered,
+      coverage: matchedCount / considered,
       canMakeNow: missingCore === 0,
       inStage: recipe.stageIds.includes(stageId),
     });
