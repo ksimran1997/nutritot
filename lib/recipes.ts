@@ -412,10 +412,103 @@ export const RECIPES: Recipe[] = [
       'Fold in a little grated cheese and serve in small pieces.',
     ],
   },
+
+  // ---- Iron & protein focused ----
+  {
+    id: 'rajma-mash',
+    title: 'Mashed kidney bean (rajma) bowl',
+    emoji: '🫘',
+    stageIds: ['9-11m', '12-23m', '24m+'],
+    diets: ['vegan', 'vegetarian', 'non-vegetarian'],
+    prepMins: 25,
+    highlights: ['Iron', 'Protein', 'Fibre'],
+    ingredients: [
+      'Cooked kidney beans (rajma)',
+      'Soft cooked tomato',
+      'A pinch of cumin',
+      'A little oil',
+      'Water',
+    ],
+    steps: [
+      'Simmer cooked kidney beans with soft tomato and a pinch of cumin until very tender.',
+      'Mash thoroughly to a smooth, lump-free texture for younger babies.',
+      'Stir in a little oil and serve warm.',
+    ],
+  },
+  {
+    id: 'spinach-lentil-puree',
+    title: 'Spinach & lentil purée',
+    emoji: '🥬',
+    stageIds: ['6-8m', '9-11m', '12-23m'],
+    diets: ['vegan', 'vegetarian', 'non-vegetarian'],
+    prepMins: 20,
+    highlights: ['Iron', 'Protein', 'Folate'],
+    ingredients: ['Red lentils', 'Soft cooked spinach', 'A little oil', 'Water'],
+    steps: [
+      'Cook lentils until very soft and stir in washed, soft-cooked spinach.',
+      'Blend smooth, adding cooking water to loosen.',
+      'Serve with a vitamin C food (like a little mashed fruit) to help iron absorption.',
+    ],
+  },
+  {
+    id: 'beef-veg-mash',
+    title: 'Soft beef & vegetable mash',
+    emoji: '🥩',
+    stageIds: ['9-11m', '12-23m', '24m+'],
+    diets: ['non-vegetarian'],
+    prepMins: 30,
+    highlights: ['Iron', 'Protein', 'Zinc'],
+    ingredients: [
+      'Finely cooked lean beef',
+      'Boiled potato',
+      'Soft cooked carrot',
+      'Water or stock (no salt)',
+    ],
+    steps: [
+      'Cook lean beef very thoroughly and blend or finely shred.',
+      'Mash with boiled potato and soft carrot, loosening with a little stock.',
+      'Serve warm at an age-appropriate texture.',
+    ],
+  },
+  {
+    id: 'chana-spinach',
+    title: 'Chickpea & spinach mash',
+    emoji: '🥗',
+    stageIds: ['9-11m', '12-23m', '24m+'],
+    diets: ['vegan', 'vegetarian', 'non-vegetarian'],
+    prepMins: 20,
+    highlights: ['Iron', 'Protein', 'Folate'],
+    ingredients: ['Cooked chickpeas', 'Soft cooked spinach', 'A little olive oil', 'Lemon juice'],
+    steps: [
+      'Mash well-cooked chickpeas with soft spinach until smooth.',
+      'Loosen with a little olive oil and a squeeze of lemon.',
+      'Serve warm — pair with a vitamin C food to boost iron uptake.',
+    ],
+  },
 ];
 
 export function recipesFor(stageId: string, diet: DietPreference): Recipe[] {
   return RECIPES.filter((r) => r.stageIds.includes(stageId) && r.diets.includes(diet));
+}
+
+/** Nutrient focus filters parents can apply to recipe lists. */
+export type NutrientFocus = 'iron' | 'protein';
+
+export const NUTRIENT_FILTERS: { id: NutrientFocus; label: string; keyword: string }[] = [
+  { id: 'iron', label: 'Iron rich', keyword: 'iron' },
+  { id: 'protein', label: 'Protein rich', keyword: 'protein' },
+];
+
+/** True when a recipe highlights the given nutrient focus. */
+export function recipeHasNutrient(recipe: Recipe, focus: NutrientFocus): boolean {
+  const keyword = NUTRIENT_FILTERS.find((f) => f.id === focus)?.keyword ?? focus;
+  return recipe.highlights.some((h) => h.toLowerCase().includes(keyword));
+}
+
+/** Filter a recipe list to those matching all selected nutrient focuses. */
+export function filterByNutrients(recipes: Recipe[], focuses: NutrientFocus[]): Recipe[] {
+  if (focuses.length === 0) return recipes;
+  return recipes.filter((r) => focuses.every((f) => recipeHasNutrient(r, f)));
 }
 
 export interface RecipeSuggestion {
@@ -489,12 +582,15 @@ const STOP_WORDS = new Set([
  * Keys and values are single lowercase tokens (post-tokenisation).
  */
 const SYNONYMS: Record<string, string[]> = {
-  // Soya chunks (textured soy protein) are a distinct food from tofu — keep
-  // them separate so "soya chunks" matches soya recipes, not the tofu one.
-  soya: ['soya', 'soy'],
-  soy: ['soy', 'soya'],
+  // Soya chunks (textured soy protein) are a distinct food from tofu. They map
+  // to the dedicated `soyachunk` token only — never to `tofu` — so "soya
+  // chunks" matches the soya recipes and never the tofu fingers.
+  soya: ['soyachunk'],
+  soy: ['soyachunk'],
+  soyachunk: ['soyachunk'],
+  chunk: ['soyachunk'],
+  // Tofu stands on its own and shares no tokens with soya chunks.
   tofu: ['tofu'],
-  chunk: ['chunk', 'soya', 'soy'],
   paneer: ['paneer', 'cottage', 'cheese'],
   cottage: ['cottage', 'paneer', 'cheese'],
   curd: ['curd', 'yogurt', 'yoghurt'],
@@ -509,6 +605,13 @@ const SYNONYMS: Record<string, string[]> = {
   channa: ['chickpea'],
   chana: ['chickpea'],
   garbanzo: ['chickpea'],
+  rajma: ['kidney', 'bean'],
+  kidney: ['kidney', 'bean'],
+  bean: ['bean', 'kidney'],
+  spinach: ['spinach'],
+  palak: ['spinach'],
+  beef: ['beef'],
+  mutton: ['beef'],
   ragi: ['ragi'],
   millet: ['ragi', 'millet'],
   jaggery: ['jaggery', 'banana'],
@@ -595,6 +698,9 @@ export function suggestFromIngredients(
     /** Total non-staple ingredients the recipe needs. */
     let coreTotal = 0;
     let matchedCount = 0;
+    /** Whether the parent covered the recipe's first (defining) core ingredient. */
+    let definingMatched = false;
+    let seenDefining = false;
 
     for (const ingredient of recipe.ingredients) {
       const tokens = tokenize(ingredient);
@@ -604,8 +710,11 @@ export function suggestFromIngredients(
 
       // Which of the parent's terms cover this recipe ingredient?
       const coveringTerms = parentTerms.filter((p) => tokens.some((t) => p.tokens.has(t)));
+      const isDefining = !isStaple && !seenDefining;
+      if (isDefining) seenDefining = true;
       if (coveringTerms.length > 0) {
         matchedCount += 1;
+        if (isDefining) definingMatched = true;
         for (const p of coveringTerms) matchedTerms.add(p.term);
       } else {
         missing.push(ingredient);
@@ -615,12 +724,17 @@ export function suggestFromIngredients(
 
     if (matchedCount === 0) continue;
 
-    // Keep suggestions grounded in what the parent listed. Allow more missing
-    // core ingredients for larger recipes, so dishes like a multi-ingredient
-    // khichdi still surface when the parent has its defining ingredient(s),
-    // while small recipes stay strict.
-    const allowedMissing = Math.max(2, Math.ceil(coreTotal / 2));
-    if (missingCore > allowedMissing) continue;
+    // Keep suggestions grounded in what the parent listed, while still letting
+    // a strong single ingredient surface its signature dish.
+    //  - If the parent covers the recipe's defining (first non-staple)
+    //    ingredient, surface it — the dish is built around something they
+    //    have — and list the rest under "Also needs". This lets "soya chunks"
+    //    surface the soya khichdi.
+    //  - Otherwise the parent must cover at least half the core ingredients,
+    //    so loosely related dishes (where they only share a minor ingredient)
+    //    don't slip in.
+    const coveredCore = coreTotal - missingCore;
+    if (!definingMatched && coveredCore < Math.ceil(coreTotal / 2)) continue;
 
     const considered = coreTotal || 1;
     suggestions.push({

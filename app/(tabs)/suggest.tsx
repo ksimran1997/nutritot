@@ -15,7 +15,12 @@ import {
 
 import { useBabyStore } from '@/lib/store';
 import { AGE_STAGES, getAgeMonths, getAgeStage } from '@/lib/nutrition';
-import { parseIngredientInput, suggestFromIngredients } from '@/lib/recipes';
+import {
+  parseIngredientInput,
+  suggestFromIngredients,
+  NUTRIENT_FILTERS,
+  recipeHasNutrient,
+} from '@/lib/recipes';
 import { DIET_LABELS } from '@/lib/utils';
 
 const QUICK_INGREDIENTS = [
@@ -171,6 +176,17 @@ export default function SuggestScreen() {
                           <Text className="text-muted text-xs">
                             {recipe.highlights.join(' · ')}
                           </Text>
+                          {NUTRIENT_FILTERS.some((f) => recipeHasNutrient(recipe, f.id)) && (
+                            <View className="flex-row flex-wrap gap-1.5 pt-0.5">
+                              {NUTRIENT_FILTERS.filter((f) => recipeHasNutrient(recipe, f.id)).map(
+                                (f) => (
+                                  <Chip key={f.id} variant="soft">
+                                    <Chip.Label>{f.label}</Chip.Label>
+                                  </Chip>
+                                ),
+                              )}
+                            </View>
+                          )}
                         </View>
                         <ChevronRight color={muted} size={18} />
                       </View>

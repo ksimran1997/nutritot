@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { Pressable, ScrollView, View } from 'react-native';
 import { ChevronRight, Clock, Sparkles } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
@@ -6,7 +6,13 @@ import { Card, Chip, Text, useThemeColor } from 'heroui-native';
 
 import { useBabyStore } from '@/lib/store';
 import { AGE_STAGES, getAgeMonths, getAgeStage } from '@/lib/nutrition';
-import { recipesFor } from '@/lib/recipes';
+import {
+  filterByNutrients,
+  type NutrientFocus,
+  NUTRIENT_FILTERS,
+  recipeHasNutrient,
+  recipesFor,
+} from '@/lib/recipes';
 import { DIET_LABELS } from '@/lib/utils';
 
 export default function RecipesScreen() {
@@ -14,14 +20,20 @@ export default function RecipesScreen() {
   const router = useRouter();
   const [muted, accent] = useThemeColor(['muted', 'accent']);
 
+  const [focuses, setFocuses] = useState<NutrientFocus[]>([]);
+
   const stage = useMemo(
     () => (profile ? getAgeStage(getAgeMonths(profile.birthDate)) : AGE_STAGES[0]),
     [profile],
   );
 
+  const toggleFocus = (id: NutrientFocus) =>
+    setFocuses((prev) => (prev.includes(id) ? prev.filter((f) => f !== id) : [...prev, id]));
+
   if (!profile) return null;
 
-  const recommended = recipesFor(stage.id, profile.diet);
+  const allRecommended = recipesFor(stage.id, profile.diet);
+  const recommended = filterByNutrients(allRecommended, focuses);
   const otherStages = AGE_STAGES.filter((s) => s.id !== stage.id);
 
   return (
@@ -63,12 +75,44 @@ export default function RecipesScreen() {
           </Card>
         </Pressable>
 
+        <View className="gap-2">
+          <Text className="text-muted px-1 text-xs font-semibold uppercase">
+            Babies need plenty of these
+          </Text>
+          <View className="flex-row flex-wrap gap-2">
+            {NUTRIENT_FILTERS.map((f) => {
+              const active = focuses.includes(f.id);
+              return (
+                <Pressable
+                  key={f.id}
+                  onPress={() => toggleFocus(f.id)}
+                  className={`rounded-full border px-3.5 py-1.5 ${
+                    active ? 'border-accent bg-peach-soft' : 'border-border bg-surface'
+                  }`}
+                >
+                  <Text
+                    className={`text-sm font-medium ${active ? 'text-accent' : 'text-foreground'}`}
+                  >
+                    {f.label}
+                  </Text>
+                </Pressable>
+              );
+            })}
+          </View>
+        </View>
+
         <Text className="text-foreground px-1 text-base font-semibold">
-          Recommended for {profile.name}
+          {focuses.length > 0
+            ? `${NUTRIENT_FILTERS.filter((f) => focuses.includes(f.id))
+                .map((f) => f.label)
+                .join(' + ')} ideas`
+            : `Recommended for ${profile.name}`}
         </Text>
         {recommended.length === 0 ? (
           <Text className="text-muted px-1 text-sm">
-            No tailored recipes for this stage yet — browse other ages below.
+            {focuses.length > 0
+              ? 'No matching ideas for this stage yet — clear a filter or browse other ages below.'
+              : 'No tailored recipes for this stage yet — browse other ages below.'}
           </Text>
         ) : (
           recommended.map((r) => (
@@ -86,7 +130,14 @@ export default function RecipesScreen() {
                       <Text className="text-muted text-xs">{r.highlights.join(' · ')}</Text>
                     </View>
                   </View>
-                  <ChevronRight color={muted} size={18} />
+                  <View className="items-end gap-1">
+                    {NUTRIENT_FILTERS.filter((f) => recipeHasNutrient(r, f.id)).map((f) => (
+                      <Chip key={f.id} variant="soft">
+                        <Chip.Label>{f.label}</Chip.Label>
+                      </Chip>
+                    ))}
+                    <ChevronRight color={muted} size={18} />
+                  </View>
                 </Card.Body>
               </Card>
             </Pressable>
