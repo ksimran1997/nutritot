@@ -11,7 +11,7 @@ export default function TabLayout() {
   const { theme } = useUniwind();
   const router = useRouter();
   const hydrated = useBabyStore((s) => s.hydrated);
-  const profile = useBabyStore((s) => s.profile);
+  const hasChildren = useBabyStore((s) => s.children.length > 0);
 
   const [background, foreground, border, accent, muted] = useThemeColor([
     'background',
@@ -22,12 +22,12 @@ export default function TabLayout() {
   ]);
 
   useEffect(() => {
-    if (hydrated && !profile) {
+    if (hydrated && !hasChildren) {
       router.replace('/onboarding');
     }
-  }, [hydrated, profile, router]);
+  }, [hydrated, hasChildren, router]);
 
-  if (hydrated && !profile) {
+  if (hydrated && !hasChildren) {
     return <Redirect href="/onboarding" />;
   }
 

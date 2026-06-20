@@ -13,7 +13,8 @@ import {
   useThemeColor,
 } from 'heroui-native';
 
-import { useBabyStore } from '@/lib/store';
+import { useActiveChild } from '@/lib/store';
+import { ChildSwitcher } from '@/components/ChildSwitcher';
 import { AGE_STAGES, getAgeMonths, getAgeStage } from '@/lib/nutrition';
 import {
   parseIngredientInput,
@@ -42,7 +43,7 @@ const QUICK_INGREDIENTS = [
 ];
 
 export default function SuggestScreen() {
-  const profile = useBabyStore((s) => s.profile);
+  const profile = useActiveChild();
   const router = useRouter();
   const [muted, accent] = useThemeColor(['muted', 'accent']);
 
@@ -82,6 +83,7 @@ export default function SuggestScreen() {
           contentContainerClassName="px-5 pt-4 pb-16 gap-4"
           keyboardShouldPersistTaps="handled"
         >
+          <ChildSwitcher />
           <View className="flex-row items-center gap-2">
             <Sparkles color={accent} size={18} />
             <Text className="text-foreground flex-1 text-sm">

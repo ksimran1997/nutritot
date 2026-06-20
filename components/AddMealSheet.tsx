@@ -18,9 +18,10 @@ const MEAL_TYPES: { value: MealType; label: string }[] = [
 interface AddMealSheetProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
+  childId: string;
 }
 
-export function AddMealSheet({ isOpen, onOpenChange }: AddMealSheetProps) {
+export function AddMealSheet({ isOpen, onOpenChange, childId }: AddMealSheetProps) {
   const addMeal = useBabyStore((s) => s.addMeal);
 
   const [name, setName] = useState('');
@@ -76,6 +77,7 @@ export function AddMealSheet({ isOpen, onOpenChange }: AddMealSheetProps) {
     if (!canSave) return;
     addMeal({
       id: uid(),
+      childId,
       date: todayKey(),
       type,
       name: name.trim(),

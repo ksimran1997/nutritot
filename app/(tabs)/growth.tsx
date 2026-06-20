@@ -5,9 +5,10 @@ import { Card, Text, useThemeColor } from 'heroui-native';
 import { format } from 'date-fns';
 
 import { AddGrowthSheet } from '@/components/AddGrowthSheet';
+import { ChildSwitcher } from '@/components/ChildSwitcher';
 import { GrowthChart } from '@/components/GrowthChart';
 import { SegmentedControl } from '@/components/SegmentedControl';
-import { useBabyStore } from '@/lib/store';
+import { useActiveChild, useBabyStore } from '@/lib/store';
 import {
   estimatePercentile,
   estimatePercentileBand,
@@ -17,13 +18,19 @@ import {
 import { getAgeMonths } from '@/lib/nutrition';
 
 export default function GrowthScreen() {
-  const profile = useBabyStore((s) => s.profile);
-  const growth = useBabyStore((s) => s.growth);
+  const profile = useActiveChild();
+  const allGrowth = useBabyStore((s) => s.growth);
   const removeGrowth = useBabyStore((s) => s.removeGrowth);
   const [danger] = useThemeColor(['danger']);
   const { width } = useWindowDimensions();
   const [metric, setMetric] = useState<GrowthMetric>('weight');
   const [sheetOpen, setSheetOpen] = useState(false);
+
+  const childId = profile?.id;
+  const growth = useMemo(
+    () => allGrowth.filter((g) => g.childId === childId),
+    [allGrowth, childId],
+  );
 
   const latest = useMemo(
     () => (growth.length > 0 ? growth[growth.length - 1] : undefined),
@@ -51,6 +58,7 @@ export default function GrowthScreen() {
   return (
     <View className="bg-background flex-1">
       <ScrollView contentContainerClassName="px-5 pt-4 pb-32 gap-4">
+        <ChildSwitcher />
         <View className="gap-1">
           <Text.Heading type="h2">Growth charts</Text.Heading>
           <Text.Paragraph color="muted">
@@ -155,7 +163,7 @@ export default function GrowthScreen() {
         <Plus color="#fff" size={26} />
       </Pressable>
 
-      <AddGrowthSheet isOpen={sheetOpen} onOpenChange={setSheetOpen} />
+      <AddGrowthSheet isOpen={sheetOpen} onOpenChange={setSheetOpen} childId={profile.id} />
     </View>
   );
 }

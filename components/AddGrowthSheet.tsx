@@ -3,17 +3,18 @@ import { View } from 'react-native';
 import { BottomSheetScrollView } from '@gorhom/bottom-sheet';
 import { BottomSheet, Button, Input, Label, Text, TextField } from 'heroui-native';
 
-import { useBabyStore } from '@/lib/store';
+import { useActiveChild, useBabyStore } from '@/lib/store';
 import { getAgeMonths } from '@/lib/nutrition';
 import { cn, todayKey, uid } from '@/lib/utils';
 
 interface AddGrowthSheetProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
+  childId: string;
 }
 
-export function AddGrowthSheet({ isOpen, onOpenChange }: AddGrowthSheetProps) {
-  const profile = useBabyStore((s) => s.profile);
+export function AddGrowthSheet({ isOpen, onOpenChange, childId }: AddGrowthSheetProps) {
+  const profile = useActiveChild();
   const addGrowth = useBabyStore((s) => s.addGrowth);
 
   const [weight, setWeight] = useState('');
@@ -32,6 +33,7 @@ export function AddGrowthSheet({ isOpen, onOpenChange }: AddGrowthSheetProps) {
     if (!profile || !canSave) return;
     addGrowth({
       id: uid(),
+      childId,
       date: todayKey(),
       ageMonths: getAgeMonths(profile.birthDate),
       weightKg: Number(weight) || 0,

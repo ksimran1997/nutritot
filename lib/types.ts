@@ -5,6 +5,7 @@ export type Sex = 'boy' | 'girl';
 export type MealType = 'breakfast' | 'lunch' | 'dinner' | 'snack';
 
 export interface BabyProfile {
+  id: string;
   name: string;
   birthDate: string; // ISO date
   sex: Sex;
@@ -13,6 +14,7 @@ export interface BabyProfile {
 
 export interface MealEntry {
   id: string;
+  childId: string;
   date: string; // ISO date (yyyy-MM-dd)
   type: MealType;
   name: string;
@@ -25,6 +27,7 @@ export interface MealEntry {
 
 export interface GrowthEntry {
   id: string;
+  childId: string;
   date: string; // ISO date (yyyy-MM-dd)
   ageMonths: number;
   weightKg: number;

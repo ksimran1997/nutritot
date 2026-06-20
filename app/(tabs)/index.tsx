@@ -4,10 +4,11 @@ import { Plus, Trash2 } from 'lucide-react-native';
 import { Card, Chip, Text, useThemeColor } from 'heroui-native';
 
 import { AddMealSheet } from '@/components/AddMealSheet';
+import { ChildSwitcher } from '@/components/ChildSwitcher';
 import { NutrientBar } from '@/components/NutrientBar';
 import { NutritionChart } from '@/components/NutritionChart';
 import { SegmentedControl } from '@/components/SegmentedControl';
-import { useBabyStore } from '@/lib/store';
+import { useActiveChild, useBabyStore } from '@/lib/store';
 import {
   buildNutritionSeries,
   formatAge,
@@ -41,14 +42,17 @@ const NUTRIENT_HEX: Record<NutrientKey, string> = {
 };
 
 export default function TodayScreen() {
-  const profile = useBabyStore((s) => s.profile);
-  const meals = useBabyStore((s) => s.meals);
+  const profile = useActiveChild();
+  const allMeals = useBabyStore((s) => s.meals);
   const removeMeal = useBabyStore((s) => s.removeMeal);
   const [danger] = useThemeColor(['danger']);
   const { width } = useWindowDimensions();
   const [sheetOpen, setSheetOpen] = useState(false);
   const [range, setRange] = useState<NutritionRange>('week');
   const [chartNutrient, setChartNutrient] = useState<NutrientKey>('calories');
+
+  const childId = profile?.id;
+  const meals = useMemo(() => allMeals.filter((m) => m.childId === childId), [allMeals, childId]);
 
   const today = todayKey();
   const todaysMeals = useMemo(() => meals.filter((m) => m.date === today), [meals, today]);
@@ -83,6 +87,7 @@ export default function TodayScreen() {
   return (
     <View className="bg-background flex-1">
       <ScrollView contentContainerClassName="px-5 pt-4 pb-32 gap-4">
+        <ChildSwitcher />
         <View className="gap-1">
           <Text.Heading type="h2">{profile.name}</Text.Heading>
           <View className="flex-row flex-wrap items-center gap-2">
@@ -251,7 +256,7 @@ export default function TodayScreen() {
         <Plus color="#fff" size={26} />
       </Pressable>
 
-      <AddMealSheet isOpen={sheetOpen} onOpenChange={setSheetOpen} />
+      <AddMealSheet isOpen={sheetOpen} onOpenChange={setSheetOpen} childId={profile.id} />
     </View>
   );
 }
