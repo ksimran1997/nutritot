@@ -289,7 +289,9 @@ export default function MapView({
         showsTraffic={showsTraffic}
         showsBuildings={showsBuildings}
         showsIndoors={showsIndoors}
-        showsPointsOfInterest={showsPointsOfInterest}
+        // react-native-maps 1.27 renamed this prop (their spelling); the public
+        // MapView API keeps `showsPointsOfInterest`.
+        showsPointsOfInterests={showsPointsOfInterest}
         showsUserLocation={showsUserLocation}
         followsUserLocation={followsUserLocation}
         scrollEnabled={scrollEnabled}
