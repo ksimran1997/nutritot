@@ -153,60 +153,61 @@ export default function SuggestScreen() {
               <Text className="text-foreground px-1 text-base font-semibold">
                 {suggestions.length} idea{suggestions.length === 1 ? '' : 's'} from your ingredients
               </Text>
-              {suggestions.map(({ recipe, matched, missing, inStage, canMakeNow }) => (
-                <Pressable key={recipe.id} onPress={() => router.push(`/recipe/${recipe.id}`)}>
-                  <Card>
-                    <Card.Body className="gap-3">
-                      <View className="flex-row items-center gap-3">
-                        <Text className="text-3xl">{recipe.emoji}</Text>
-                        <View className="flex-1 gap-1">
-                          <View className="flex-row items-center gap-2">
-                            <Text className="text-foreground flex-1 font-semibold">
-                              {recipe.title}
+              {suggestions.map(({ recipe, matched, missing, inStage, canMakeNow }) => {
+                const nutrientTags = NUTRIENT_FILTERS.filter((f) =>
+                  recipeHasNutrient(recipe, f.id),
+                );
+                const showTagRow = canMakeNow || !inStage || nutrientTags.length > 0;
+
+                return (
+                  <Pressable key={recipe.id} onPress={() => router.push(`/recipe/${recipe.id}`)}>
+                    <Card>
+                      <Card.Body className="gap-3">
+                        <View className="flex-row items-center gap-3">
+                          <Text className="text-3xl">{recipe.emoji}</Text>
+                          <View className="flex-1 gap-1">
+                            <Text className="text-foreground font-semibold">{recipe.title}</Text>
+                            <Text className="text-muted text-xs">
+                              {recipe.highlights.join(' · ')}
                             </Text>
-                            {canMakeNow ? (
-                              <Chip variant="soft">
-                                <Chip.Label>Ready to make</Chip.Label>
-                              </Chip>
-                            ) : null}
-                            {!inStage && (
-                              <Chip variant="tertiary">
-                                <Chip.Label>Other age</Chip.Label>
-                              </Chip>
-                            )}
-                          </View>
-                          <Text className="text-muted text-xs">
-                            {recipe.highlights.join(' · ')}
-                          </Text>
-                          {NUTRIENT_FILTERS.some((f) => recipeHasNutrient(recipe, f.id)) && (
-                            <View className="flex-row flex-wrap gap-1.5 pt-0.5">
-                              {NUTRIENT_FILTERS.filter((f) => recipeHasNutrient(recipe, f.id)).map(
-                                (f) => (
+                            {showTagRow && (
+                              <View className="flex-row flex-wrap items-center gap-1.5 pt-0.5">
+                                {canMakeNow ? (
+                                  <Chip variant="soft">
+                                    <Chip.Label>Ready to make</Chip.Label>
+                                  </Chip>
+                                ) : null}
+                                {!inStage && (
+                                  <Chip variant="tertiary">
+                                    <Chip.Label>Other age</Chip.Label>
+                                  </Chip>
+                                )}
+                                {nutrientTags.map((f) => (
                                   <Chip key={f.id} variant="soft">
                                     <Chip.Label>{f.label}</Chip.Label>
                                   </Chip>
-                                ),
-                              )}
-                            </View>
+                                ))}
+                              </View>
+                            )}
+                          </View>
+                          <ChevronRight color={muted} size={18} />
+                        </View>
+
+                        <View className="gap-1">
+                          <Text className="text-mint text-xs font-semibold">
+                            You have: {matched.join(', ')}
+                          </Text>
+                          {missing.length > 0 && (
+                            <Text className="text-muted text-xs">
+                              Also needs: {missing.join(', ')}
+                            </Text>
                           )}
                         </View>
-                        <ChevronRight color={muted} size={18} />
-                      </View>
-
-                      <View className="gap-1">
-                        <Text className="text-mint text-xs font-semibold">
-                          You have: {matched.join(', ')}
-                        </Text>
-                        {missing.length > 0 && (
-                          <Text className="text-muted text-xs">
-                            Also needs: {missing.join(', ')}
-                          </Text>
-                        )}
-                      </View>
-                    </Card.Body>
-                  </Card>
-                </Pressable>
-              ))}
+                      </Card.Body>
+                    </Card>
+                  </Pressable>
+                );
+              })}
             </View>
           )}
 
