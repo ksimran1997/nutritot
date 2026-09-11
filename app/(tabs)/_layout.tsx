@@ -58,13 +58,6 @@ export default function TabLayout() {
           }}
         />
         <Tabs.Screen
-          name="growth"
-          options={{
-            title: 'Growth',
-            tabBarIcon: ({ color, size }) => <LineChart color={color} size={size ?? 24} />,
-          }}
-        />
-        <Tabs.Screen
           name="recipes"
           options={{
             title: 'Recipes',
@@ -76,6 +69,13 @@ export default function TabLayout() {
           options={{
             title: 'Suggest',
             tabBarIcon: ({ color, size }) => <Sparkles color={color} size={size ?? 24} />,
+          }}
+        />
+        <Tabs.Screen
+          name="growth"
+          options={{
+            title: 'Growth',
+            tabBarIcon: ({ color, size }) => <LineChart color={color} size={size ?? 24} />,
           }}
         />
         <Tabs.Screen
