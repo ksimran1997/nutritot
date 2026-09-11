@@ -16,6 +16,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     orientation: 'portrait',
     userInterfaceStyle: 'automatic',
     scheme: 'nutritot',
+    icon: './assets/images/nutritot-logo.png',
     runtimeVersion: {
       policy: 'appVersion',
     },
@@ -34,6 +35,11 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     },
     android: {
       package: process.env.BILT_ANDROID_PACKAGE ?? 'com.yourcompany.yourapp',
+      icon: './assets/images/nutritot-logo.png',
+      adaptiveIcon: {
+        foregroundImage: './assets/images/adaptive-icon.png',
+        backgroundColor: '#FFFFFF',
+      },
     },
     extra: {
       appStoreAppId: process.env.BILT_APP_STORE_APP_ID,
