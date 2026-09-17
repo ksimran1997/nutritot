@@ -36,6 +36,8 @@ const QUICK_INGREDIENTS = [
   'sweet potato',
   'squash',
   'pumpkin',
+  'apple',
+  'dragon fruit',
   'mango',
   'papaya',
   'okra',
