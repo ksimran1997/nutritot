@@ -35,7 +35,7 @@ export default function RecipesScreen() {
 
   const allRecommended = recipesFor(stage.id, profile.diet);
   const recommended = filterByNutrients(allRecommended, focuses);
-  const otherStages = AGE_STAGES.filter((s) => s.id !== stage.id);
+  const browseStages = AGE_STAGES;
 
   return (
     <View className="bg-background flex-1">
@@ -146,10 +146,8 @@ export default function RecipesScreen() {
           ))
         )}
 
-        <Text className="text-foreground mt-2 px-1 text-base font-semibold">
-          Explore other ages
-        </Text>
-        {otherStages.map((s) => {
+        <Text className="text-foreground mt-2 px-1 text-base font-semibold">Browse by age</Text>
+        {browseStages.map((s) => {
           const count = recipesFor(s.id, profile.diet).length;
           return (
             <Card key={s.id} variant="secondary">
