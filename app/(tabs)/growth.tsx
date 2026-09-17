@@ -32,9 +32,23 @@ export default function GrowthScreen() {
     [allGrowth, childId],
   );
 
+  const growthForMetric = useMemo(
+    () =>
+      growth.filter((entry) => {
+        const value =
+          metric === 'weight'
+            ? entry.weightKg
+            : metric === 'height'
+              ? entry.heightCm
+              : entry.headCm;
+        return value !== undefined && value > 0;
+      }),
+    [growth, metric],
+  );
+
   const latest = useMemo(
-    () => (growth.length > 0 ? growth[growth.length - 1] : undefined),
-    [growth],
+    () => (growthForMetric.length > 0 ? growthForMetric[growthForMetric.length - 1] : undefined),
+    [growthForMetric],
   );
 
   if (!profile) return null;
@@ -42,7 +56,12 @@ export default function GrowthScreen() {
   const chartWidth = Math.min(width, 520) - 40 - 32; // screen padding + card padding
   const ageMonths = getAgeMonths(profile.birthDate);
 
-  const latestValue = latest && (metric === 'weight' ? latest.weightKg : latest.heightCm);
+  const latestValue =
+    latest &&
+    (metric === 'weight' ? latest.weightKg : metric === 'height' ? latest.heightCm : latest.headCm);
+  const metricLabel = metric === 'head' ? 'head circumference' : metric;
+  const latestMeasurement =
+    latestValue !== undefined ? `${latestValue} ${metric === 'weight' ? 'kg' : 'cm'}` : '';
 
   const latestBand =
     latest &&
@@ -73,20 +92,26 @@ export default function GrowthScreen() {
           options={[
             { value: 'weight', label: 'Weight' },
             { value: 'height', label: 'Height' },
+            { value: 'head', label: 'Head' },
           ]}
         />
 
         <Card>
           <Card.Body className="gap-3">
-            {growth.length === 0 ? (
+            {growthForMetric.length === 0 ? (
               <View className="items-center gap-1 py-10">
-                <Text className="text-muted text-sm">No measurements yet.</Text>
+                <Text className="text-muted text-sm">No {metricLabel} measurements yet.</Text>
                 <Text className="text-muted text-xs">
-                  Add weight and height to see the growth curve.
+                  Add {metricLabel} to see the growth curve.
                 </Text>
               </View>
             ) : (
-              <GrowthChart metric={metric} sex={profile.sex} entries={growth} width={chartWidth} />
+              <GrowthChart
+                metric={metric}
+                sex={profile.sex}
+                entries={growthForMetric}
+                width={chartWidth}
+              />
             )}
           </Card.Body>
         </Card>
@@ -96,8 +121,7 @@ export default function GrowthScreen() {
             <Card.Body className="gap-2">
               <View className="flex-row items-center justify-between gap-3">
                 <Text className="text-foreground text-sm font-semibold">
-                  Latest {metric}:{' '}
-                  {metric === 'weight' ? `${latest.weightKg} kg` : `${latest.heightCm} cm`}
+                  Latest {metricLabel}: {latestMeasurement}
                 </Text>
                 <View className="bg-accent/15 rounded-full px-3 py-1">
                   <Text className="text-accent text-sm font-semibold">

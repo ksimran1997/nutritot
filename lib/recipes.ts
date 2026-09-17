@@ -44,6 +44,59 @@ export const RECIPES: Recipe[] = [
     steps: ['Mash avocado until very smooth.', 'Thin with milk to a runny purée.', 'Serve fresh.'],
   },
   {
+    id: 'squash-puree',
+    title: 'Smooth squash or pumpkin purée',
+    emoji: '🎃',
+    stageIds: ['6-8m', '9-11m'],
+    diets: ['vegan', 'vegetarian', 'non-vegetarian'],
+    prepMins: 20,
+    highlights: ['Vitamin A', 'Fibre', 'Energy'],
+    ingredients: ['Squash, pumpkin, kabocha, or bottle gourd', 'Water or milk to thin'],
+    steps: [
+      'Peel, remove seeds, and cut the vegetable into small pieces.',
+      'Steam until completely soft.',
+      'Blend smooth, adding a little water or milk for the right texture.',
+    ],
+  },
+  {
+    id: 'tropical-fruit-oat-bowl',
+    title: 'Tropical fruit oat bowl',
+    emoji: '🥭',
+    stageIds: ['6-8m', '9-11m', '12-23m', '24m+'],
+    diets: ['vegan', 'vegetarian', 'non-vegetarian'],
+    prepMins: 10,
+    highlights: ['Vitamin C', 'Fibre', 'Energy'],
+    ingredients: [
+      'Ripe mango, papaya, guava, kiwi, pear, peach, or plantain',
+      'Baby oats',
+      'Water or milk',
+    ],
+    steps: [
+      'Peel the fruit and remove every seed, stone, and tough part.',
+      'Cook oats until soft, then stir in mashed or finely chopped fruit.',
+      'Adjust the texture and pieces for the child’s age before serving.',
+    ],
+  },
+  {
+    id: 'international-veg-lentil-mash',
+    title: 'Vegetable & lentil mash',
+    emoji: '🥣',
+    stageIds: ['9-11m', '12-23m', '24m+'],
+    diets: ['vegan', 'vegetarian', 'non-vegetarian'],
+    prepMins: 25,
+    highlights: ['Iron', 'Protein', 'Fibre'],
+    ingredients: [
+      'Okra, aubergine, courgette, chayote, yam, taro, cassava, beetroot, or sweetcorn',
+      'Red lentils',
+      'Water',
+    ],
+    steps: [
+      'Prepare the chosen vegetable safely by peeling and removing seeds or tough parts as needed.',
+      'Cook it with lentils until everything is completely soft.',
+      'Mash or finely chop to an age-appropriate texture and serve warm.',
+    ],
+  },
+  {
     id: 'iron-lentil-puree',
     title: 'Red lentil & carrot purée',
     emoji: '🥕',
@@ -655,6 +708,20 @@ const SYNONYMS: Record<string, string[]> = {
   bean: ['bean', 'kidney'],
   spinach: ['spinach'],
   palak: ['spinach'],
+  mango: ['mango', 'tropicalfruit'],
+  aam: ['mango', 'tropicalfruit'],
+  papaya: ['papaya', 'tropicalfruit'],
+  pawpaw: ['papaya', 'tropicalfruit'],
+  guava: ['guava', 'tropicalfruit'],
+  kiwi: ['kiwi', 'tropicalfruit'],
+  persimmon: ['persimmon', 'tropicalfruit'],
+  lychee: ['lychee', 'tropicalfruit'],
+  litchi: ['lychee', 'tropicalfruit'],
+  pitaya: ['dragonfruit', 'tropicalfruit'],
+  dragonfruit: ['dragonfruit', 'tropicalfruit'],
+  plantain: ['plantain', 'tropicalfruit'],
+  pear: ['pear', 'tropicalfruit'],
+  peach: ['peach', 'tropicalfruit'],
   beef: ['beef'],
   mutton: ['beef'],
   ragi: ['ragi'],
@@ -662,9 +729,37 @@ const SYNONYMS: Record<string, string[]> = {
   jaggery: ['jaggery', 'banana'],
   ghee: ['ghee', 'oil', 'butter'],
   butter: ['butter', 'oil', 'ghee'],
-  courgette: ['courgette', 'zucchini'],
-  zucchini: ['zucchini', 'courgette'],
-  capsicum: ['pepper'],
+  courgette: ['courgette', 'zucchini', 'internationalvegetable'],
+  zucchini: ['zucchini', 'courgette', 'internationalvegetable'],
+  squash: ['squash', 'pumpkin', 'internationalvegetable'],
+  pumpkin: ['pumpkin', 'squash', 'internationalvegetable'],
+  butternut: ['squash', 'pumpkin', 'internationalvegetable'],
+  kabocha: ['squash', 'pumpkin', 'internationalvegetable'],
+  calabaza: ['squash', 'pumpkin', 'internationalvegetable'],
+  courge: ['squash', 'pumpkin', 'internationalvegetable'],
+  gourd: ['gourd', 'squash', 'internationalvegetable'],
+  lauki: ['gourd', 'squash', 'internationalvegetable'],
+  dudhi: ['gourd', 'squash', 'internationalvegetable'],
+  calabash: ['gourd', 'squash', 'internationalvegetable'],
+  chayote: ['chayote', 'internationalvegetable'],
+  chowchow: ['chayote', 'internationalvegetable'],
+  okra: ['okra', 'internationalvegetable'],
+  bhindi: ['okra', 'internationalvegetable'],
+  ladyfinger: ['okra', 'internationalvegetable'],
+  taro: ['taro', 'rootvegetable', 'internationalvegetable'],
+  arbi: ['taro', 'rootvegetable', 'internationalvegetable'],
+  colocasia: ['taro', 'rootvegetable', 'internationalvegetable'],
+  cassava: ['cassava', 'rootvegetable', 'internationalvegetable'],
+  yuca: ['cassava', 'rootvegetable', 'internationalvegetable'],
+  manioc: ['cassava', 'rootvegetable', 'internationalvegetable'],
+  yam: ['yam', 'rootvegetable', 'internationalvegetable'],
+  ube: ['yam', 'rootvegetable', 'internationalvegetable'],
+  beet: ['beetroot', 'internationalvegetable'],
+  beetroot: ['beetroot', 'internationalvegetable'],
+  corn: ['sweetcorn', 'internationalvegetable'],
+  maize: ['sweetcorn', 'internationalvegetable'],
+  sweetcorn: ['sweetcorn', 'internationalvegetable'],
+  capsicum: ['pepper', 'internationalvegetable'],
   brinjal: ['aubergine', 'eggplant'],
   aubergine: ['aubergine', 'eggplant'],
   eggplant: ['eggplant', 'aubergine'],
@@ -684,15 +779,25 @@ const SYNONYMS: Record<string, string[]> = {
   shakarkandi: ['sweet', 'potato'],
 };
 
+/** Reduce a common English plural without damaging singular ingredient names. */
+function singularize(word: string): string {
+  if (word.endsWith('ies') && word.length > 4) return `${word.slice(0, -3)}y`;
+  if (/(?:ch|sh|x|z|o)es$/.test(word)) return word.slice(0, -2);
+  if (word.endsWith('s') && !/(?:ss|us|is)$/.test(word)) return word.slice(0, -1);
+  return word;
+}
+
 /** Normalise a phrase into meaningful keyword tokens, expanding known synonyms. */
 function tokenize(text: string): string[] {
   const base = text
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
     .toLowerCase()
     .replace(/[^a-z\s/]/g, ' ')
     .split(/[\s/]+/)
-    .map((w) => w.trim())
-    .filter((w) => w.length > 2 && !STOP_WORDS.has(w))
-    .map((w) => (w.endsWith('es') ? w.slice(0, -2) : w.endsWith('s') ? w.slice(0, -1) : w));
+    .map((word) => word.trim())
+    .filter((word) => word.length > 2 && !STOP_WORDS.has(word))
+    .map(singularize);
 
   const expanded = new Set<string>();
   for (const word of base) {

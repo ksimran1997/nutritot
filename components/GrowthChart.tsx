@@ -20,6 +20,12 @@ const PAD_T = 16;
 const PAD_B = 28;
 const MAX_MONTH = 24;
 
+function valueForMetric(entry: GrowthEntry, metric: GrowthMetric): number | undefined {
+  if (metric === 'weight') return entry.weightKg;
+  if (metric === 'height') return entry.heightCm;
+  return entry.headCm;
+}
+
 export function GrowthChart({ metric, sex, entries, width }: GrowthChartProps) {
   const [accent, muted, border] = useThemeColor(['accent', 'muted', 'border']);
 
@@ -27,7 +33,9 @@ export function GrowthChart({ metric, sex, entries, width }: GrowthChartProps) {
 
   const { yMin, yMax } = useMemo(() => {
     const vals = bands.flatMap((b) => [b.p3, b.p97]);
-    const userVals = entries.map((e) => (metric === 'weight' ? e.weightKg : e.heightCm));
+    const userVals = entries
+      .map((entry) => valueForMetric(entry, metric))
+      .filter((value): value is number => value !== undefined && value > 0);
     const all = [...vals, ...userVals];
     const lo = Math.min(...all);
     const hi = Math.max(...all);
@@ -47,16 +55,19 @@ export function GrowthChart({ metric, sex, entries, width }: GrowthChartProps) {
       .join(' ');
   };
 
-  const userPath = (() => {
-    const pts = entries
-      .filter((e) => e.ageMonths <= MAX_MONTH)
-      .map((e) => ({
-        x: xFor(e.ageMonths),
-        y: yFor(metric === 'weight' ? e.weightKg : e.heightCm),
-      }));
-    if (pts.length === 0) return '';
-    return pts.map((p, i) => `${i === 0 ? 'M' : 'L'}${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ');
-  })();
+  const plottedEntries = entries.flatMap((entry) => {
+    const value = valueForMetric(entry, metric);
+    return entry.ageMonths <= MAX_MONTH && value !== undefined && value > 0
+      ? [{ entry, value }]
+      : [];
+  });
+
+  const userPath = plottedEntries
+    .map(
+      ({ entry, value }, index) =>
+        `${index === 0 ? 'M' : 'L'}${xFor(entry.ageMonths).toFixed(1)},${yFor(value).toFixed(1)}`,
+    )
+    .join(' ');
 
   const yTicks = useMemo(() => {
     const ticks: number[] = [];
@@ -121,17 +132,15 @@ export function GrowthChart({ metric, sex, entries, width }: GrowthChartProps) {
 
         {/* user line */}
         {userPath ? <Path d={userPath} stroke={accent} strokeWidth={2.5} fill="none" /> : null}
-        {entries
-          .filter((e) => e.ageMonths <= MAX_MONTH)
-          .map((e) => (
-            <Circle
-              key={e.id}
-              cx={xFor(e.ageMonths)}
-              cy={yFor(metric === 'weight' ? e.weightKg : e.heightCm)}
-              r={3.5}
-              fill={accent}
-            />
-          ))}
+        {plottedEntries.map(({ entry, value }) => (
+          <Circle
+            key={entry.id}
+            cx={xFor(entry.ageMonths)}
+            cy={yFor(value)}
+            r={3.5}
+            fill={accent}
+          />
+        ))}
       </Svg>
       <View className="flex-row flex-wrap gap-4 px-2">
         <Legend color={accent} label={`${profileMetricLabel(metric)} (${unit})`} />
@@ -142,7 +151,9 @@ export function GrowthChart({ metric, sex, entries, width }: GrowthChartProps) {
 }
 
 function profileMetricLabel(metric: GrowthMetric) {
-  return metric === 'weight' ? 'Weight' : 'Height';
+  if (metric === 'weight') return 'Weight';
+  if (metric === 'height') return 'Height';
+  return 'Head circumference';
 }
 
 function Legend({

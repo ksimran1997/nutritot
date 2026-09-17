@@ -21,7 +21,7 @@ export function AddGrowthSheet({ isOpen, onOpenChange, childId }: AddGrowthSheet
   const [height, setHeight] = useState('');
   const [head, setHead] = useState('');
 
-  const canSave = Number(weight) > 0 || Number(height) > 0;
+  const canSave = Number(weight) > 0 || Number(height) > 0 || Number(head) > 0;
 
   function reset() {
     setWeight('');
