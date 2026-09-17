@@ -174,6 +174,51 @@ export const RECIPES: Recipe[] = [
       'Serve at a safe temperature.',
     ],
   },
+  {
+    id: 'lentil-sweet-potato-patties',
+    title: 'Lentil & sweet potato patties',
+    emoji: '🍠',
+    stageIds: ['12-23m'],
+    diets: ['vegan', 'vegetarian', 'non-vegetarian'],
+    prepMins: 25,
+    highlights: ['Iron', 'Protein', 'Fibre'],
+    ingredients: ['Cooked red lentils', 'Mashed sweet potato', 'Oat flour', 'A little olive oil'],
+    steps: [
+      'Mix the lentils, sweet potato and oat flour into a soft dough.',
+      'Shape into small flat patties.',
+      'Cook with a little oil until set, then cool and cut into easy-to-hold pieces.',
+    ],
+  },
+  {
+    id: 'spinach-cheese-omelette',
+    title: 'Spinach & cheese omelette',
+    emoji: '🍳',
+    stageIds: ['12-23m'],
+    diets: ['vegetarian', 'non-vegetarian'],
+    prepMins: 10,
+    highlights: ['Protein', 'Iron', 'Calcium'],
+    ingredients: ['1 egg', 'Finely chopped spinach', 'Grated mild cheese', 'A little oil'],
+    steps: [
+      'Whisk the egg with spinach and cheese.',
+      'Cook gently until the egg is fully set on both sides.',
+      'Cool slightly and slice into soft finger-sized strips.',
+    ],
+  },
+  {
+    id: 'turkey-vegetable-meatballs',
+    title: 'Turkey & vegetable meatballs',
+    emoji: '🍗',
+    stageIds: ['12-23m'],
+    diets: ['non-vegetarian'],
+    prepMins: 30,
+    highlights: ['Iron', 'Protein', 'Zinc'],
+    ingredients: ['Minced turkey', 'Grated courgette', 'Oat flour', 'A little olive oil'],
+    steps: [
+      'Mix the turkey, courgette and oat flour.',
+      'Shape into small meatballs and bake until fully cooked through.',
+      'Cut into safe bite-sized pieces before serving.',
+    ],
+  },
 
   // ---- Indian ----
   {

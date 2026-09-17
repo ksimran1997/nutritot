@@ -46,7 +46,7 @@ export const AGE_STAGES: AgeStage[] = [
   },
   {
     id: '12-23m',
-    label: '12–23 months',
+    label: '1 year +',
     minMonths: 12,
     maxMonths: 24,
     summary: 'Family foods',
