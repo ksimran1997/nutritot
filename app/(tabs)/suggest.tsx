@@ -32,6 +32,10 @@ const QUICK_INGREDIENTS = [
   'soya chunks',
   'paneer',
   'chickpeas',
+  'beans',
+  'quinoa',
+  'couscous',
+  'tomato',
   'carrot',
   'sweet potato',
   'squash',
@@ -112,7 +116,7 @@ export default function SuggestScreen() {
           <TextField>
             <Label>Ingredients</Label>
             <Input
-              placeholder="e.g. banana, oats, milk"
+              placeholder="e.g. broccoli, rice, beans, mango"
               value={input}
               onChangeText={setInput}
               multiline
@@ -151,8 +155,8 @@ export default function SuggestScreen() {
               <Card.Body className="gap-1">
                 <Text className="text-foreground font-semibold">Nothing matches yet</Text>
                 <Text className="text-muted text-sm">
-                  We only show ideas you can make from what you listed. Add another ingredient or
-                  two (e.g. banana, oats, lentils, carrot), or browse all ideas in the Recipes tab.
+                  Add another ingredient (for example a vegetable, fruit, grain, bean, egg, dairy,
+                  meat, fish, nut, seed, herb, or spice), or browse all ideas in the Recipes tab.
                 </Text>
               </Card.Body>
             </Card>
