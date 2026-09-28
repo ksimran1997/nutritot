@@ -19,6 +19,43 @@ function round(n: number, decimals = 0): number {
   return Math.round(n * f) / f;
 }
 
+const UNICODE_FRACTIONS: Record<string, number> = {
+  '¼': 0.25,
+  '½': 0.5,
+  '¾': 0.75,
+  '⅓': 1 / 3,
+  '⅔': 2 / 3,
+  '⅛': 0.125,
+  '⅜': 0.375,
+  '⅝': 0.625,
+  '⅞': 0.875,
+};
+
+function parseQuantity(text: string): number {
+  const mixedFraction = text.match(/(\d+)\s+(\d+)\s*\/\s*(\d+)/);
+  if (mixedFraction) {
+    const denominator = Number(mixedFraction[3]);
+    if (denominator > 0) return Number(mixedFraction[1]) + Number(mixedFraction[2]) / denominator;
+  }
+
+  const fraction = text.match(/(\d+)\s*\/\s*(\d+)/);
+  if (fraction) {
+    const denominator = Number(fraction[2]);
+    if (denominator > 0) return Number(fraction[1]) / denominator;
+  }
+
+  const unicodeFraction = Object.entries(UNICODE_FRACTIONS).find(([symbol]) =>
+    text.includes(symbol),
+  );
+  if (unicodeFraction) {
+    const whole = text.match(/(\d+)\s*[¼½¾⅓⅔⅛⅜⅝⅞]/);
+    return (whole ? Number(whole[1]) : 0) + unicodeFraction[1];
+  }
+
+  const decimal = text.match(/(?:^|\s)(\d+(?:\.\d+)?)/);
+  return decimal ? Number(decimal[1]) : 1;
+}
+
 /**
  * Very rough local estimator used when no AI key is configured. Scales a
  * baseline nutrient density by keywords found in the food description and by a
@@ -27,8 +64,8 @@ function round(n: number, decimals = 0): number {
 function heuristicEstimate(food: string, portion: string): NutrientEstimate {
   const text = `${food} ${portion}`.toLowerCase();
 
-  // Parse a gram amount from the portion ("100g", "1 cup", "2 tbsp"...).
-  const grams = parsePortionGrams(text);
+  // Parse a gram amount from the portion ("100g", "1/2 bowl", "2 tbsp"...).
+  const grams = parsePortionGrams(portion.toLowerCase());
   const factor = grams / 100; // nutrient tables are per 100g
 
   // Baseline per-100g density for a generic mixed baby food.
@@ -88,20 +125,28 @@ function heuristicEstimate(food: string, portion: string): NutrientEstimate {
   };
 }
 
-function parsePortionGrams(text: string): number {
-  const gramMatch = text.match(/(\d+(?:\.\d+)?)\s*(g|gram|grams)\b/);
-  if (gramMatch) return clamp(Number(gramMatch[1]), 1, 2000);
+export function parsePortionGrams(text: string): number {
+  const normalizedText = text.toLowerCase();
+  const amountPattern =
+    '((?:\\d+\\s+)?\\d+\\s*\\/\\s*\\d+|\\d+\\s*[¼½¾⅓⅔⅛⅜⅝⅞]|\\d+(?:\\.\\d+)?|[¼½¾⅓⅔⅛⅜⅝⅞])';
+  const gramMatch = normalizedText.match(new RegExp(`${amountPattern}\\s*(?:g|gram|grams)\\b`));
+  if (gramMatch) return clamp(parseQuantity(gramMatch[1]), 1, 2000);
 
-  const mlMatch = text.match(/(\d+(?:\.\d+)?)\s*(ml|millilit)/);
-  if (mlMatch) return clamp(Number(mlMatch[1]), 1, 2000); // ~1g per ml
+  const mlMatch = normalizedText.match(new RegExp(`${amountPattern}\\s*(?:ml|millilit)`));
+  if (mlMatch) return clamp(parseQuantity(mlMatch[1]), 1, 2000); // ~1g per ml
 
-  const qty = text.match(/(\d+(?:\.\d+)?)/);
-  const n = qty ? Number(qty[1]) : 1;
-  if (text.includes('cup')) return clamp(n * 150, 1, 2000);
-  if (text.includes('tbsp') || text.includes('tablespoon')) return clamp(n * 15, 1, 2000);
-  if (text.includes('tsp') || text.includes('teaspoon')) return clamp(n * 5, 1, 2000);
-  if (text.includes('bowl')) return clamp(n * 200, 1, 2000);
-  if (text.includes('piece') || text.includes('slice')) return clamp(n * 40, 1, 2000);
+  const quantity = parseQuantity(normalizedText);
+  if (normalizedText.includes('cup')) return clamp(quantity * 150, 1, 2000);
+  if (normalizedText.includes('tbsp') || normalizedText.includes('tablespoon')) {
+    return clamp(quantity * 15, 1, 2000);
+  }
+  if (normalizedText.includes('tsp') || normalizedText.includes('teaspoon')) {
+    return clamp(quantity * 5, 1, 2000);
+  }
+  if (normalizedText.includes('bowl')) return clamp(quantity * 200, 1, 2000);
+  if (normalizedText.includes('piece') || normalizedText.includes('slice')) {
+    return clamp(quantity * 40, 1, 2000);
+  }
   // Default to a typical baby serving.
   return 80;
 }
@@ -125,11 +170,16 @@ function isOpenAINutrients(v: unknown): v is OpenAINutrients {
 
 async function aiEstimate(food: string, portion: string): Promise<NutrientEstimate> {
   const portionText = portion.trim() ? portion.trim() : 'a typical baby serving';
+  const servingGrams = parsePortionGrams(portion.toLowerCase());
+  const servingFactor = servingGrams / 100;
   const prompt =
-    `Estimate the nutrient content of this food for a baby/toddler meal.\n` +
-    `Food: ${food}\nPortion: ${portionText}\n\n` +
-    `Return ONLY a JSON object with numeric fields: calories (kcal), protein (grams), ` +
-    `iron (mg), calcium (mg). No text, no units, just the JSON.`;
+    `Estimate the nutrient density of this prepared food.\n` +
+    `Food: ${food}\n\n` +
+    `Return values for exactly 100 grams of the food. The entered serving is ${portionText} ` +
+    `(approximately ${round(servingGrams, 1)} grams), but do not calculate the serving totals.\n\n` +
+    `Return ONLY a JSON object with numeric fields: calories (kcal per 100g), ` +
+    `protein (grams per 100g), iron (mg per 100g), calcium (mg per 100g). ` +
+    `No text, no units, just the JSON.`;
 
   const res = await fetch('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
@@ -166,10 +216,10 @@ async function aiEstimate(food: string, portion: string): Promise<NutrientEstima
 
   return {
     source: 'ai',
-    calories: clamp(round(Number(parsedRaw.calories) || 0), 0, 4000),
-    protein: clamp(round(Number(parsedRaw.protein) || 0, 1), 0, 200),
-    iron: clamp(round(Number(parsedRaw.iron) || 0, 2), 0, 50),
-    calcium: clamp(round(Number(parsedRaw.calcium) || 0), 0, 3000),
+    calories: clamp(round((Number(parsedRaw.calories) || 0) * servingFactor), 0, 4000),
+    protein: clamp(round((Number(parsedRaw.protein) || 0) * servingFactor, 1), 0, 200),
+    iron: clamp(round((Number(parsedRaw.iron) || 0) * servingFactor, 2), 0, 50),
+    calcium: clamp(round((Number(parsedRaw.calcium) || 0) * servingFactor), 0, 3000),
   };
 }
 
