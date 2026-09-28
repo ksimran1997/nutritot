@@ -125,29 +125,59 @@ function heuristicEstimate(food: string, portion: string): NutrientEstimate {
   };
 }
 
+const PORTION_AMOUNT_PATTERN =
+  '((?:\\d+\\s+)?\\d+\\s*\\/\\s*\\d+|\\d+\\s*[¼½¾⅓⅔⅛⅜⅝⅞]|\\d+(?:[.,]\\d+)?|[¼½¾⅓⅔⅛⅜⅝⅞])';
+
+interface PortionUnit {
+  pattern: string;
+  grams: number;
+}
+
+/**
+ * Standardized gram equivalents used to scale per-100g nutrition data.
+ * Volume uses the practical estimate of 1ml = 1g; household containers and
+ * count units are approximate because their actual capacity or size varies.
+ */
+const PORTION_UNITS: PortionUnit[] = [
+  { pattern: 'kilograms?|kilogrammes?|kgs?|kilos?', grams: 1000 },
+  { pattern: 'milligrams?|mgs?', grams: 0.001 },
+  { pattern: 'grams?|grammes?|gms?|g', grams: 1 },
+  { pattern: 'pounds?|lbs?', grams: 453.592 },
+  { pattern: 'ounces?|oz', grams: 28.3495 },
+  { pattern: 'lit(?:er|re)s?|ltrs?|lt|l', grams: 1000 },
+  { pattern: 'centilit(?:er|re)s?|cls?', grams: 10 },
+  { pattern: 'millilit(?:er|re)s?|mls?', grams: 1 },
+  { pattern: 'fluid\\s*ounces?|fl\\.?\\s*oz', grams: 29.5735 },
+  { pattern: 'cups?', grams: 240 },
+  { pattern: 'tablespoons?|table\\s*spoons?|tbsps?|tbsp|tbs', grams: 15 },
+  { pattern: 'teaspoons?|tea\\s*spoons?|tsps?|tsp', grams: 5 },
+  { pattern: 'bowls?', grams: 200 },
+  { pattern: 'scoops?', grams: 30 },
+  { pattern: 'handfuls?', grams: 30 },
+  { pattern: 'slices?', grams: 30 },
+  { pattern: 'pieces?|pcs?', grams: 40 },
+  { pattern: 'servings?|portions?', grams: 80 },
+];
+
 export function parsePortionGrams(text: string): number {
-  const normalizedText = text.toLowerCase();
-  const amountPattern =
-    '((?:\\d+\\s+)?\\d+\\s*\\/\\s*\\d+|\\d+\\s*[¼½¾⅓⅔⅛⅜⅝⅞]|\\d+(?:\\.\\d+)?|[¼½¾⅓⅔⅛⅜⅝⅞])';
-  const gramMatch = normalizedText.match(new RegExp(`${amountPattern}\\s*(?:g|gram|grams)\\b`));
-  if (gramMatch) return clamp(parseQuantity(gramMatch[1]), 1, 2000);
+  const normalizedText = text.toLowerCase().replaceAll(',', '.').trim();
+  if (!normalizedText) return 80;
 
-  const mlMatch = normalizedText.match(new RegExp(`${amountPattern}\\s*(?:ml|millilit)`));
-  if (mlMatch) return clamp(parseQuantity(mlMatch[1]), 1, 2000); // ~1g per ml
+  for (const unit of PORTION_UNITS) {
+    const match = normalizedText.match(
+      new RegExp(`${PORTION_AMOUNT_PATTERN}\\s*(?:${unit.pattern})\\.?\\b`),
+    );
+    if (match) {
+      return clamp(parseQuantity(match[1]) * unit.grams, 0.001, 5000);
+    }
+  }
 
-  const quantity = parseQuantity(normalizedText);
-  if (normalizedText.includes('cup')) return clamp(quantity * 150, 1, 2000);
-  if (normalizedText.includes('tbsp') || normalizedText.includes('tablespoon')) {
-    return clamp(quantity * 15, 1, 2000);
-  }
-  if (normalizedText.includes('tsp') || normalizedText.includes('teaspoon')) {
-    return clamp(quantity * 5, 1, 2000);
-  }
-  if (normalizedText.includes('bowl')) return clamp(quantity * 200, 1, 2000);
-  if (normalizedText.includes('piece') || normalizedText.includes('slice')) {
-    return clamp(quantity * 40, 1, 2000);
-  }
-  // Default to a typical baby serving.
+  // A number without a measurement is treated as a count of typical
+  // baby-size servings, so "2 bananas" or simply "2" scales from "1".
+  const hasQuantity = new RegExp(PORTION_AMOUNT_PATTERN).test(normalizedText);
+  if (hasQuantity) return clamp(parseQuantity(normalizedText) * 80, 0.001, 5000);
+
+  // No stated quantity means one typical baby serving.
   return 80;
 }
 

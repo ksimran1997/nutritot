@@ -112,7 +112,7 @@ export function AddMealSheet({ isOpen, onOpenChange, childId }: AddMealSheetProp
               <TextField>
                 <Label>Portion</Label>
                 <Input
-                  placeholder="e.g. 1 bowl, 100g, 2 tbsp"
+                  placeholder="e.g. 2 bowls, 1/2 tbsp, 150 ml, 75 g"
                   value={portion}
                   onChangeText={setPortion}
                 />
