@@ -13,8 +13,9 @@ import {
   useThemeColor,
 } from 'heroui-native';
 
-import { useActiveChild } from '@/lib/store';
+import { AdBanner } from '@/components/AdBanner';
 import { ChildSwitcher } from '@/components/ChildSwitcher';
+import { useActiveChild } from '@/lib/store';
 import { AGE_STAGES, getAgeMonths, getAgeStage } from '@/lib/nutrition';
 import {
   parseIngredientInput,
@@ -96,6 +97,7 @@ export default function SuggestScreen() {
           keyboardShouldPersistTaps="handled"
         >
           <ChildSwitcher />
+          <AdBanner />
           <View className="flex-row items-center gap-2">
             <Sparkles color={accent} size={18} />
             <Text className="text-foreground flex-1 text-sm">

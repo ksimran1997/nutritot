@@ -4,6 +4,7 @@ import { Plus, Trash2 } from 'lucide-react-native';
 import { Card, Chip, Text, useThemeColor } from 'heroui-native';
 
 import { AddMealSheet } from '@/components/AddMealSheet';
+import { AdBanner } from '@/components/AdBanner';
 import { ChildSwitcher } from '@/components/ChildSwitcher';
 import { NutrientBar } from '@/components/NutrientBar';
 import { NutritionChart } from '@/components/NutritionChart';
@@ -88,6 +89,7 @@ export default function TodayScreen() {
     <View className="bg-background flex-1">
       <ScrollView contentContainerClassName="px-5 pt-4 pb-32 gap-4">
         <ChildSwitcher />
+        <AdBanner />
         <View className="gap-1">
           <Text.Heading type="h2">{profile.name}</Text.Heading>
           <View className="flex-row flex-wrap items-center gap-2">

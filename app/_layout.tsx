@@ -23,6 +23,7 @@ import {
 } from 'expo-router';
 
 import { initPostHog } from '@/lib/posthog';
+import { initializeMobileAds } from '@/lib/mobileAds';
 import { reportErrorToParent } from '@/lib/reportPreviewError';
 
 /**
@@ -114,6 +115,12 @@ export default function RootLayout() {
       return () => clearTimeout(timer);
     }
     return undefined;
+  }, []);
+
+  useEffect(() => {
+    if (Platform.OS !== 'web') {
+      void initializeMobileAds();
+    }
   }, []);
 
   useEffect(() => {

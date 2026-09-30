@@ -4,8 +4,9 @@ import { ChevronRight, Clock, Sparkles } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 import { Card, Chip, Text, useThemeColor } from 'heroui-native';
 
-import { useActiveChild } from '@/lib/store';
+import { AdBanner } from '@/components/AdBanner';
 import { ChildSwitcher } from '@/components/ChildSwitcher';
+import { useActiveChild } from '@/lib/store';
 import { AGE_STAGES, getAgeMonths, getAgeStage } from '@/lib/nutrition';
 import {
   filterByNutrients,
@@ -41,6 +42,7 @@ export default function RecipesScreen() {
     <View className="bg-background flex-1">
       <ScrollView contentContainerClassName="px-5 pt-4 pb-16 gap-4">
         <ChildSwitcher />
+        <AdBanner />
         <View className="gap-1">
           <Text.Heading type="h2">Food ideas</Text.Heading>
           <View className="flex-row flex-wrap items-center gap-2">

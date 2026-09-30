@@ -50,6 +50,12 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       'expo-splash-screen',
       'expo-status-bar',
       [
+        'react-native-google-mobile-ads',
+        {
+          androidAppId: 'ca-app-pub-3683465218447064~6475703530',
+        },
+      ],
+      [
         'expo-build-properties',
         {
           android: {
