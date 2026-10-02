@@ -89,7 +89,6 @@ export default function TodayScreen() {
     <View className="bg-background flex-1">
       <ScrollView contentContainerClassName="px-5 pt-4 pb-32 gap-4">
         <ChildSwitcher />
-        <AdBanner />
         <View className="gap-1">
           <Text.Heading type="h2">{profile.name}</Text.Heading>
           <View className="flex-row flex-wrap items-center gap-2">
@@ -240,6 +239,8 @@ export default function TodayScreen() {
             ))
           )}
         </View>
+
+        <AdBanner />
       </ScrollView>
 
       <Pressable

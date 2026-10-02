@@ -5,7 +5,6 @@ import { Card, Text, useThemeColor } from 'heroui-native';
 import { format } from 'date-fns';
 
 import { AddGrowthSheet } from '@/components/AddGrowthSheet';
-import { AdBanner } from '@/components/AdBanner';
 import { ChildSwitcher } from '@/components/ChildSwitcher';
 import { GrowthChart } from '@/components/GrowthChart';
 import { SegmentedControl } from '@/components/SegmentedControl';
@@ -79,7 +78,6 @@ export default function GrowthScreen() {
     <View className="bg-background flex-1">
       <ScrollView contentContainerClassName="px-5 pt-4 pb-32 gap-4">
         <ChildSwitcher />
-        <AdBanner />
         <View className="gap-1">
           <Text.Heading type="h2">Growth charts</Text.Heading>
           <Text.Paragraph color="muted">
