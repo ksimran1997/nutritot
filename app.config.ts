@@ -34,7 +34,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     },
     android: {
       package: process.env.BILT_ANDROID_PACKAGE ?? 'com.yourcompany.yourapp',
-      versionCode: 13,
+      versionCode: 15,
       icon: './assets/images/nutritot-logo.png',
       adaptiveIcon: {
         foregroundImage: './assets/images/adaptive-icon.png',
